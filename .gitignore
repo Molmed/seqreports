@@ -1,3 +1,8 @@
 .idea
 *.log
-
+Singularity_images
+.nextflow*
+playground.nf
+results
+work
+resources
