@@ -1,0 +1,21 @@
+Bootstrap:docker
+From:biocontainers/bowtie2:2.2.9
+
+%files
+    fastq_screen_singularity.conf
+    FastQ_Screen_Genomes
+
+%labels
+    AUTHOR monika.brandt@medsci.uu.se
+    TEXT This is the singularity recipe file needed to run FastqScreen
+
+%post
+    apt-get -y update
+    apt-get -y install wget
+    wget https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz
+    tar -xzf /fastq_screen_v0.13.0.tar.gz
+    chmod +x /fastq_screen_v0.13.0/fastq_screen
+    ln -s /fastq_screen_v0.13.0/fastq_screen /usr/local/bin/fastq_screen
+
+%runscript
+    exec fastq_screen --c fastq_screen_singularity.conf "$@"

@@ -1,48 +1,99 @@
-//This is a simple nextflow script that runs fastqc on a single fastq-file.
+//This is a simple nextflow script that runs interop_summary,fastqc, and fastqscreen on a runfolder.
 //The result is passed on to a process creating a multiqc report that finally is copied to a results directory
-// The script assumes nextflow to be available in PATH and that Singularity images are defined.
-//If you want to avoid entering the Singularity image as a command line parameter,
-//you can define it in the Nextflow configuration file nextflow.config.
+// The script assumes nextflow to be available in PATH and that Singularity images are defined in nextflow.config.
 //Use the following command to run the script
-//nextflow run run_nextflow_singularity.nf -c nextflow.config
+//nextflow run run_multiqc_nextflow.nf -c nextflow.config
+
+params.runfolder = "/TestData/BaseSpace/180126_HSX122_0568_BHLFWLBBXX"
+runfolder = file(params.runfolder)
 
 //Use path to fastq-file as input
-fastqs = Channel.fromPath('/summary-report-development/resources/fastqs/example_S1_L001_R1_001.fastq.gz')
+unaligned = file("$runfolder/Unaligned")
+Channel.fromPath("$unaligned/**.fastq.gz", maxDepth: 3 ).into{ input_fastqc; input_fastqscreen }
 
 //Create directory where results should be written.
 results_dir = file('/summary-report-development/nextflow/results')
 results_dir.mkdir()
 
-process runFastqc {
+multiqc_results_dir = file("$runfolder/MultiQC")
+multiqc_results_dir.mkdir()
 
-    publishDir results_dir, mode: 'copy', overwrite: false
+interop_summary_results_dir = file("$results_dir/Interop_summary")
+interop_summary_results_dir.mkdir()
+
+
+process runInteropSummary {
+
+    publishDir interop_summary_results_dir, mode: 'copy', overwrite: false
 
     input:
-    file myFastq name 'example.fastq.gz' from fastqs
+    file runfolder
 
     output:
-    file fastqc_results
+    file runfolder_summary_interop into interop_summary_results
+
 
     """
-    mkdir fastqc_results
-    fastqc -o fastqc_results $myFastq
+    /opt/miniconda/bin/interop_summary --csv=1 $runfolder >> runfolder_summary_interop
     """
 }
 
+fastqc_results_dir = file("$results_dir/FastQC")
+fastqc_results_dir.mkdir()
+
+process runFastqc {
+
+    publishDir fastqc_results_dir, mode: 'copy', overwrite: false
+
+    input:
+    file myFastq from input_fastqc
+
+    output:
+    file "*_fastqc.{zip,html}" into fastqc_results
+
+    """
+    fastqc $myFastq
+    """
+}
+
+
+
+fastqscreen_results_dir = file("$results_dir/FastQScreen")
+fastqscreen_results_dir.mkdir()
+
+process runFastqScreen {
+
+    publishDir fastqscreen_results_dir, mode: 'copy', overwrite: false
+
+    input:
+    file myFastq from input_fastqscreen
+
+    output:
+    file "*_screen.{txt,html}" into fastqscreen_results
+
+
+    """
+    fastq_screen -c /fastq_screen_singularity.conf $myFastq
+    """
+}
 
 process runMultiQC {
 
-    publishDir results_dir, mode: 'copy', overwrite: false
+    publishDir multiqc_results_dir, mode: 'copy', overwrite: false
 
     input:
-    file fastqc_results
+    file (fastqc:'FastQC/*') from fastqc_results.collect().ifEmpty([])
+    file (fastqscreen:'FastQScreen/*') from fastqscreen_results.collect().ifEmpty([])
+    file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
+    file runfolder
 
     output:
-    file multiqc_results
+    file "*multiqc_report.html" into multiqc_report
+    file "*_data"
 
     """
-    mkdir multiqc_results
-    multiqc --outdir multiqc_results fastqc_results
+    multiqc -m bcl2fastq -m interop -m fastqc -m fastq_screen .
     """
 
 }
+
