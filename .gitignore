@@ -1,8 +1,11 @@
 .idea
 *.log
-Singularity_images
 .nextflow*
 playground.nf
 results
 work
 resources
+*.ismg
+*.simg
+*.img
+FastQ_Screen_Genomes
