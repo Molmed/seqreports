@@ -11,11 +11,16 @@ runfolder = file(params.runfolder)
 unaligned = file("$runfolder/Unaligned")
 Channel.fromPath("$unaligned/**.fastq.gz", maxDepth: 3 ).into{ input_fastqc; input_fastqscreen }
 
+params.fastq_screen_config = "config/fastq_screen.conf"
+fastq_screen_config = file(params.fastq_screen_config)
+
+fastq_screen_db = file(params.fastq_screen_db)
+
 //Create directory where results should be written.
-results_dir = file('/summary-report-development/nextflow/results')
+results_dir = file('results')
 results_dir.mkdir()
 
-multiqc_results_dir = file("$runfolder/MultiQC")
+multiqc_results_dir = file("$results_dir/MultiQC")
 multiqc_results_dir.mkdir()
 
 interop_summary_results_dir = file("$results_dir/Interop_summary")
@@ -24,7 +29,7 @@ interop_summary_results_dir.mkdir()
 
 process runInteropSummary {
 
-    publishDir interop_summary_results_dir, mode: 'copy', overwrite: false
+    publishDir interop_summary_results_dir, mode: 'symlink', overwrite: true
 
     input:
     file runfolder
@@ -34,7 +39,7 @@ process runInteropSummary {
 
 
     """
-    /opt/miniconda/bin/interop_summary --csv=1 $runfolder >> runfolder_summary_interop
+    summary --csv=1 $runfolder > runfolder_summary_interop
     """
 }
 
@@ -43,7 +48,7 @@ fastqc_results_dir.mkdir()
 
 process runFastqc {
 
-    publishDir fastqc_results_dir, mode: 'copy', overwrite: false
+    publishDir fastqc_results_dir, mode: 'symlink', overwrite: true
 
     input:
     file myFastq from input_fastqc
@@ -63,23 +68,24 @@ fastqscreen_results_dir.mkdir()
 
 process runFastqScreen {
 
-    publishDir fastqscreen_results_dir, mode: 'copy', overwrite: false
+    publishDir fastqscreen_results_dir, mode: 'symlink', overwrite: true
 
     input:
     file myFastq from input_fastqscreen
+    file config from fastq_screen_config
+    file db from fastq_screen_db
 
     output:
     file "*_screen.{txt,html}" into fastqscreen_results
 
-
     """
-    fastq_screen -c /fastq_screen_singularity.conf $myFastq
+    fastq_screen --conf $config $myFastq
     """
 }
 
 process runMultiQC {
 
-    publishDir multiqc_results_dir, mode: 'copy', overwrite: false
+    publishDir multiqc_results_dir, mode: 'symlink', overwrite: true
 
     input:
     file (fastqc:'FastQC/*') from fastqc_results.collect().ifEmpty([])
