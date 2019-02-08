@@ -5,5 +5,9 @@ This repository is not a repository for the final product and the final code. Th
 
 
 # Downloading fastqc-screen database
-Download fastqc-screen from  [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz).
-Uncompress it and run `fastq_screen --get_genomes`
+Ideally we want to do this automatically, tough right now there are problems with internet-access from the
+fastq-screen containers, so this is a temporary workaround for that. Here's how you do it:
+
+ - Download fastqc-screen from  [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz).
+ - Uncompress it
+ - Run `fastq_screen --get_genomes`
