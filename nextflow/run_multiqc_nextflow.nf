@@ -36,8 +36,13 @@ Channel
 params.fastq_screen_config = "config/fastq_screen.conf"
 fastq_screen_config = file(params.fastq_screen_config)
 
+params.multiqc_config = "config/multiqc_config.yaml"
+multiqc_config = file(params.multiqc_config)
+
 fastq_screen_db = file(params.fastq_screen_db)
 
+params.assets = "assets/"
+assets = file(params.assets)
 
 // ---------------------------------------------------
 // Create directories where results should be written.
@@ -99,20 +104,25 @@ fastq_screen_results.into{ fastq_screen_results_for_flowcell;  fastq_screen_resu
 
 process MultiQCPerFlowcell {
 
-    publishDir file("$results_dir/flowcell_report"), mode: 'symlink', overwrite: true
+    publishDir file("$results_dir/flowcell_report"), mode: 'copy', overwrite: true
 
     input:
     file (fastqc:'FastQC/*') from fastqc_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (fastqscreen:'FastQScreen/*') from fastq_screen_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
     file runfolder
+    file config from multiqc_config
+    file assets from assets
 
     output:
     file "*multiqc_report.html" into multiqc_report_per_flowcell
     file "*_data"
 
     """
-    multiqc -m fastqc -m fastq_screen .
+    multiqc \
+        --title "Flowcell Report for ${runfolder.getFileName()}" \
+        -m fastqc -m fastq_screen -m bcl2fastq -m interop -c $config \
+        .
     """
 
 }
@@ -129,18 +139,26 @@ fastq_screen_results_for_project_ungrouped
 
 process MultiQCPerProject {
 
-    publishDir file("$results_dir/Projects/"), mode: 'symlink', overwrite: true
+    publishDir file("$results_dir/projects/"), mode: 'copy', overwrite: true
 
     input:
     set project, file(fastqc: "*") from fastqc_results_for_project_grouped_by_project
     set project_fastq_screen, file(fastqc_screen: "*") from fastq_screen_results_for_project_grouped_by_project
+    file config from multiqc_config
+    file runfolder
+    file assets from assets
 
     output:
     file "$project/*multiqc_report.html" into multiqc_report_per_project
     file "$project/*_data"
 
     """
-    multiqc --title $project -m bcl2fastq -m interop -m fastqc -m fastq_screen . -o $project
+    multiqc \
+        --title "Report for Project $project on Runfolder ${runfolder.getFileName()}" \
+        -m fastqc -m fastq_screen \
+        -o $project \
+        -c $config \
+        .
     """
 
 }
