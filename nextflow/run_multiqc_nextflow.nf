@@ -54,9 +54,6 @@ fastqc_results_dir = file("$results_dir/FastQC")
 // ---------------------------------------------------
 process InteropSummary {
 
-    // TODO Remove
-    // publishDir interop_summary_results_dir, mode: 'symlink', overwrite: true
-
     input:
     file runfolder
 
@@ -70,9 +67,6 @@ process InteropSummary {
 
 process Fastqc {
 
-    // TODO Remove
-    // publishDir fastqc_results_dir, mode: 'symlink', overwrite: true
-
     input:
     set val(project), file(fastq_file) from input_fastqc
 
@@ -85,9 +79,6 @@ process Fastqc {
 }
 
 process FastqScreen {
-
-    // TODO Remove
-    // publishDir fastqscreen_results_dir, mode: 'symlink', overwrite: true
 
     input:
     set val(project), file(fastq_file) from input_fastqscreen
@@ -110,8 +101,8 @@ process MultiQCPerFlowcell {
 
     input:
     file (fastqc:'FastQC/*') from fastqc_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
-//    file (fastqscreen:'FastQScreen/*') from fastqscreen_results.collect().ifEmpty([])
-//    file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
+    file (fastqscreen:'FastQScreen/*') from fastqscreen_results.map{ it.get(1) }.collect().ifEmpty([])
+    file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
     file runfolder
 
     output:
@@ -127,7 +118,8 @@ process MultiQCPerFlowcell {
 fastqc_results_for_project_ungrouped
     .groupTuple()
     .map { [it.get(0), it.get(1).flatten()] }
-    .map { println "Project: " + it.get(0); it.get(1).each{ x -> println "\t$x" }; it }
+    // TODO Remove
+    //.map { println "Project: " + it.get(0); it.get(1).each{ x -> println "\t$x" }; it }
     .set { fastqc_results_for_project_grouped_by_project }
 
 process MultiQCPerProject {
