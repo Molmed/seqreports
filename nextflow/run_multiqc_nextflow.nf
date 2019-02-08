@@ -78,6 +78,8 @@ process Fastqc {
     """
 }
 
+fastqc_results.into{ fastqc_results_for_flowcell;  fastqc_results_for_project_ungrouped }
+
 process FastqScreen {
 
     input:
@@ -86,14 +88,14 @@ process FastqScreen {
     file db from fastq_screen_db
 
     output:
-    set val(project), file("*_screen.{txt,html}") into fastqscreen_results
+    set val(project), file("*_screen.{txt,html}") into fastq_screen_results
 
     """
     fastq_screen --conf $config $fastq_file
     """
 }
 
-fastqc_results.into{ fastqc_results_for_flowcell;  fastqc_results_for_project_ungrouped }
+fastq_screen_results.into{ fastq_screen_results_for_flowcell;  fastq_screen_results_for_project_ungrouped }
 
 process MultiQCPerFlowcell {
 
@@ -101,7 +103,7 @@ process MultiQCPerFlowcell {
 
     input:
     file (fastqc:'FastQC/*') from fastqc_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
-    file (fastqscreen:'FastQScreen/*') from fastqscreen_results.map{ it.get(1) }.collect().ifEmpty([])
+    file (fastqscreen:'FastQScreen/*') from fastq_screen_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
     file runfolder
 
@@ -110,7 +112,7 @@ process MultiQCPerFlowcell {
     file "*_data"
 
     """
-    multiqc -m bcl2fastq -m interop -m fastqc -m fastq_screen .
+    multiqc -m fastqc -m fastq_screen .
     """
 
 }
@@ -118,16 +120,20 @@ process MultiQCPerFlowcell {
 fastqc_results_for_project_ungrouped
     .groupTuple()
     .map { [it.get(0), it.get(1).flatten()] }
-    // TODO Remove
-    //.map { println "Project: " + it.get(0); it.get(1).each{ x -> println "\t$x" }; it }
     .set { fastqc_results_for_project_grouped_by_project }
+
+fastq_screen_results_for_project_ungrouped
+    .groupTuple()
+    .map { [it.get(0), it.get(1).flatten()] }
+    .set { fastq_screen_results_for_project_grouped_by_project }
 
 process MultiQCPerProject {
 
     publishDir file("$results_dir/Projects/"), mode: 'symlink', overwrite: true
 
     input:
-    set project, file("*") from fastqc_results_for_project_grouped_by_project
+    set project, file(fastqc: "*") from fastqc_results_for_project_grouped_by_project
+    set project_fastq_screen, file(fastqc_screen: "*") from fastq_screen_results_for_project_grouped_by_project
 
     output:
     file "$project/*multiqc_report.html" into multiqc_report_per_project
