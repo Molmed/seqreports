@@ -16,7 +16,10 @@ runfolder = file(params.runfolder)
 
 //Use path to fastq-file as input
 unaligned = file("$runfolder/Unaligned")
-Channel.fromPath("$unaligned/**.fastq.gz", maxDepth: 3 ).into{ input_fastqc; input_fastqscreen }
+Channel
+    .fromPath("$unaligned/**.fastq.gz", maxDepth: 3 )
+    .filter( ~/^.*_[^I]\d_001\.fastq\.gz$/)
+    .into{ input_fastqc; input_fastqscreen }
 
 params.fastq_screen_config = "config/fastq_screen.conf"
 fastq_screen_config = file(params.fastq_screen_config)
