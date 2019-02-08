@@ -19,13 +19,24 @@ unaligned = file("$runfolder/Unaligned")
 Channel
     .fromPath("$unaligned/**.fastq.gz", maxDepth: 3 )
     .filter( ~/^.*_[^I]\d_001\.fastq\.gz$/)
+    .map {
+        path = file(it)
+        if (path.getFileName().toString().startsWith('Undetermined')){
+            ['NoProject', path]
+        } else {
+            // Check the folder directly under Unaligned and assume that is
+            // the project name
+            matches = path =~ /^.*\/Unaligned\/([^\/]+)\/.*\.fastq\.gz$/
+            project = matches[0][1]
+            [project, path]
+        }
+    }
     .into{ input_fastqc; input_fastqscreen }
 
 params.fastq_screen_config = "config/fastq_screen.conf"
 fastq_screen_config = file(params.fastq_screen_config)
 
 fastq_screen_db = file(params.fastq_screen_db)
-
 
 
 // ---------------------------------------------------
@@ -43,14 +54,14 @@ fastqc_results_dir = file("$results_dir/FastQC")
 // ---------------------------------------------------
 process InteropSummary {
 
-    publishDir interop_summary_results_dir, mode: 'symlink', overwrite: true
+    // TODO Remove
+    // publishDir interop_summary_results_dir, mode: 'symlink', overwrite: true
 
     input:
     file runfolder
 
     output:
     file runfolder_summary_interop into interop_summary_results
-
 
     """
     summary --csv=1 $runfolder > runfolder_summary_interop
@@ -59,48 +70,52 @@ process InteropSummary {
 
 process Fastqc {
 
-    publishDir fastqc_results_dir, mode: 'symlink', overwrite: true
+    // TODO Remove
+    // publishDir fastqc_results_dir, mode: 'symlink', overwrite: true
 
     input:
-    file myFastq from input_fastqc
+    set val(project), file(fastq_file) from input_fastqc
 
     output:
-    file "*_fastqc.{zip,html}" into fastqc_results
+    set val(project), file("*_fastqc.{zip,html}") into fastqc_results
 
     """
-    fastqc $myFastq
+    fastqc $fastq_file
     """
 }
 
 process FastqScreen {
 
-    publishDir fastqscreen_results_dir, mode: 'symlink', overwrite: true
+    // TODO Remove
+    // publishDir fastqscreen_results_dir, mode: 'symlink', overwrite: true
 
     input:
-    file myFastq from input_fastqscreen
+    set val(project), file(fastq_file) from input_fastqscreen
     file config from fastq_screen_config
     file db from fastq_screen_db
 
     output:
-    file "*_screen.{txt,html}" into fastqscreen_results
+    set val(project), file("*_screen.{txt,html}") into fastqscreen_results
 
     """
-    fastq_screen --conf $config $myFastq
+    fastq_screen --conf $config $fastq_file
     """
 }
 
-process MultiQC {
+fastqc_results.into{ fastqc_results_for_flowcell;  fastqc_results_for_project_ungrouped }
 
-    publishDir multiqc_results_dir, mode: 'symlink', overwrite: true
+process MultiQCPerFlowcell {
+
+    publishDir file("$results_dir/flowcell_report"), mode: 'symlink', overwrite: true
 
     input:
-    file (fastqc:'FastQC/*') from fastqc_results.collect().ifEmpty([])
-    file (fastqscreen:'FastQScreen/*') from fastqscreen_results.collect().ifEmpty([])
-    file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
+    file (fastqc:'FastQC/*') from fastqc_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
+//    file (fastqscreen:'FastQScreen/*') from fastqscreen_results.collect().ifEmpty([])
+//    file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
     file runfolder
 
     output:
-    file "*multiqc_report.html" into multiqc_report
+    file "*multiqc_report.html" into multiqc_report_per_flowcell
     file "*_data"
 
     """
@@ -109,3 +124,25 @@ process MultiQC {
 
 }
 
+fastqc_results_for_project_ungrouped
+    .groupTuple()
+    .map { [it.get(0), it.get(1).flatten()] }
+    .map { println "Project: " + it.get(0); it.get(1).each{ x -> println "\t$x" }; it }
+    .set { fastqc_results_for_project_grouped_by_project }
+
+process MultiQCPerProject {
+
+    publishDir file("$results_dir/Projects/"), mode: 'symlink', overwrite: true
+
+    input:
+    set project, file("*") from fastqc_results_for_project_grouped_by_project
+
+    output:
+    file "$project/*multiqc_report.html" into multiqc_report_per_project
+    file "$project/*_data"
+
+    """
+    multiqc --title $project -m bcl2fastq -m interop -m fastqc -m fastq_screen . -o $project
+    """
+
+}
