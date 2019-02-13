@@ -48,10 +48,6 @@ assets = file(params.assets)
 // Create directories where results should be written.
 // ---------------------------------------------------
 results_dir = file('results')
-multiqc_results_dir = file("$results_dir/MultiQC")
-interop_summary_results_dir = file("$results_dir/Interop_summary")
-fastqscreen_results_dir = file("$results_dir/FastQScreen")
-fastqc_results_dir = file("$results_dir/FastQC")
 
 
 // ---------------------------------------------------
