@@ -1,6 +1,16 @@
 # QC criteria for NGI Uppsala, based on values in INS-00123
 # Compatible with MultiQC v1.6
 
+subtitle: "SNP&SEQ Technology Platform"
+intro_text: |
+  This is a report containing quality control information about your project run at the SNP&SEQ Technology
+  Platform. If you have any questions, please do not hesitate to contact us at
+  <a href="mailto:seq@medsci.uu.se">seq@medsci.uu.se</a>
+
+custom_logo: 'assets/UU_logo_tranp4f125px.png'
+custom_logo_url: 'http://sequencing.se'
+custom_logo_title: 'SNP&SEQ Technology Platform'
+
 max_table_rows: 1000
 
 table_cond_formatting_rules:
