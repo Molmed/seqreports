@@ -118,6 +118,7 @@ process MultiQCPerFlowcell {
     multiqc \
         --title "Flowcell Report for ${runfolder.getFileName()}" \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -c $config \
+        --disable_clarity \
         .
     """
 
@@ -152,6 +153,7 @@ process MultiQCPerProject {
     multiqc \
         --title "Report for Project $project on Runfolder ${runfolder.getFileName()}" \
         -m fastqc -m fastq_screen \
+        --clarity_project $project \
         -o $project \
         -c $config \
         .
