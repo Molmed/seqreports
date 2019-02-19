@@ -13,7 +13,7 @@ custom_logo_title: 'SNP&SEQ Technology Platform'
 
 
 clarity:
-    name_edit_regex: '^.*.\/(.*)_Lane\d_S\d+_L00\d_[R|I]\d_001\.fastq\.gz|^.*\/(Undetermined_S\d).*$'
+    name_edit_regex: '^.*.\/(.*)_L00\d_[R|I]\d_001\.fastq\.gz$'
 
     report_header_info:
         Project:
