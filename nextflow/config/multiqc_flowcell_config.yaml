@@ -1,0 +1,24 @@
+# Config for flowcell Reports
+
+subtitle: "SNP&SEQ Technology Platform"
+intro_text: |
+  This is a report containing quality control information about your project run at the SNP&SEQ Technology
+  Platform. If you have any questions, please do not hesitate to contact us at
+  <a href="mailto:seq@medsci.uu.se">seq@medsci.uu.se</a>
+
+custom_logo: 'assets/UU_logo_tranp4f125px.png'
+custom_logo_url: 'http://sequencing.se'
+custom_logo_title: 'SNP&SEQ Technology Platform'
+
+table_columns_visible:
+    FastQC:
+        percent_duplicates: False
+        percent_gc: False
+        total_sequences: False
+
+top_modules:
+    - 'bcl2fastq'
+    - 'interop'
+
+remove_sections:
+    - 'fastqc_sequence_counts'
