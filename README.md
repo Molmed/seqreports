@@ -17,3 +17,13 @@ fastq-screen containers, so this is a temporary workaround for that. Here's how 
  - Download fastqc-screen from  [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz).
  - Uncompress it
  - Run `fastq_screen --get_genomes`
+
+
+# How to run the nextflow pipeline
+Awesome, you're all set! Let's try generating reports for your favourite runfolder:
+```
+cd nextflow
+nextflow -c config/nextflow.config run run_multiqc_nextflow.nf \
+          --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
+          --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
+```

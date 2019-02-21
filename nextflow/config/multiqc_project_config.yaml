@@ -1,5 +1,4 @@
-# QC criteria for NGI Uppsala, based on values in INS-00123
-# Compatible with MultiQC v1.6
+# Config for project reports
 
 subtitle: "SNP&SEQ Technology Platform"
 intro_text: |
@@ -10,7 +9,6 @@ intro_text: |
 custom_logo: 'assets/UU_logo_tranp4f125px.png'
 custom_logo_url: 'http://sequencing.se'
 custom_logo_title: 'SNP&SEQ Technology Platform'
-
 
 clarity:
     name_edit_regex: '^.*.\/(.*)_L00\d_[R|I]\d_001\.fastq\.gz$'
@@ -43,57 +41,9 @@ clarity:
 #            'Insert size (bp)':
 #                description: 'Target insert size'
 
+table_columns_visible:
+    FastQC:
+        percent_duplicates: False
 
-
-max_table_rows: 1000
-
-table_cond_formatting_rules:
-    mqc-generalstats-qualimap-percentage_aligned:
-        pass:
-            - gt: 97.1
-        fail:
-            - lt: 97.1
-
-    mqc-generalstats-qualimap-avg_gc:
-        pass:
-            - gt: 40.5
-            - lt: 42.1
-        fail:
-            - lt: 40.5
-            - gt: 42.1
-
-    mqc-generalstats-qualimap-median_insert_size: 
-        pass:
-            - gt: 317
-            - lt: 428 
-        fail:
-            - lt: 317
-            - gt: 428
-
-    mqc-generalstats-qualimap-10_x_pc: 
-        pass:
-            - gt: 91
-        fail:
-            - lt: 91
-    
-    mqc-generalstats-qualimap-30_x_pc: 
-        pass:
-            - gt: 58
-        fail:
-            - lt: 58
-
-    mqc-generalstats-snpeff-Number_of_variants_before_filter: 
-        pass:
-            - gt: 4.8
-            - lt: 5.3
-        fail:
-            - lt: 4.8
-            - gt: 5.3
-
-    mqc-generalstats-snpeff-Ts_Tv_ratio: 
-        pass:
-            - gt: 1.98
-            - lt: 2.01
-        fail:
-            - lt: 1.98
-            - gt: 2.01
+remove_sections:
+    - 'fastqc_sequence_counts'

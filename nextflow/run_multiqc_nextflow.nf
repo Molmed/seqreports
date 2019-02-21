@@ -36,8 +36,11 @@ Channel
 params.fastq_screen_config = "config/fastq_screen.conf"
 fastq_screen_config = file(params.fastq_screen_config)
 
-params.multiqc_config = "config/multiqc_config.yaml"
-multiqc_config = file(params.multiqc_config)
+params.multiqc_flowcell_config = "config/multiqc_flowcell_config.yaml"
+multiqc_flowcell_config = file(params.multiqc_flowcell_config)
+
+params.multiqc_project_config = "config/multiqc_project_config.yaml"
+multiqc_project_config = file(params.multiqc_project_config)
 
 fastq_screen_db = file(params.fastq_screen_db)
 
@@ -107,7 +110,7 @@ process MultiQCPerFlowcell {
     file (fastqscreen:'FastQScreen/*') from fastq_screen_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
     file runfolder
-    file config from multiqc_config
+    file config from multiqc_flowcell_config
     file assets from assets
 
     output:
@@ -141,7 +144,7 @@ process MultiQCPerProject {
     input:
     set project, file(fastqc: "*") from fastqc_results_for_project_grouped_by_project
     set project_fastq_screen, file(fastqc_screen: "*") from fastq_screen_results_for_project_grouped_by_project
-    file config from multiqc_config
+    file config from multiqc_project_config
     file runfolder
     file assets from assets
 
