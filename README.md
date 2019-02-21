@@ -22,7 +22,7 @@ fastq-screen containers, so this is a temporary workaround for that. Here's how 
 # How to run the nextflow pipeline
 Awesome, you're all set! Let's try generating reports for your favourite runfolder:
 ```
-nextflow -c config/nextflow.config run run_multiqc_nextflow.nf \
+nextflow -c config/nextflow.config run main.nf \
           --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
           --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
 ```
