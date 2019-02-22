@@ -1,6 +1,9 @@
+#!/usr/bin/env python
+
 from checkQC.run_type_recognizer import RunTypeRecognizer
 from checkQC.config import ConfigFactory
 import argparse
+import yaml
 
 def convert_to_multiqc_config(checkqc_config):
     for qc_criteria in checkqc_config:
@@ -32,4 +35,5 @@ if __name__ == "__main__":
     checkqc_config = config.get_handler_configs(instrument_and_reagent_version, read_length)
     multiqc_config = convert_to_multiqc_config(checkqc_config)
 
-    print(multiqc_config)
+    with open('qc_thresholds.yaml', 'w') as outfile:
+        yaml.dump(multiqc_config, outfile)
