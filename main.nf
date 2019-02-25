@@ -101,6 +101,20 @@ process FastqScreen {
 
 fastq_screen_results.into{ fastq_screen_results_for_flowcell;  fastq_screen_results_for_project_ungrouped }
 
+process GetQCThresholds {
+  input:
+  file runfolder
+
+  output:
+  file("qc_thresholds.yaml") into qc_thresholds_result
+
+  """
+  /summary-report-development/bin/get_qc_config.py --runfolder $runfolder
+
+  """
+
+}
+
 process MultiQCPerFlowcell {
 
     publishDir file("$results_dir/flowcell_report"), mode: 'copy', overwrite: true
@@ -109,6 +123,7 @@ process MultiQCPerFlowcell {
     file (fastqc:'FastQC/*') from fastqc_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (fastqscreen:'FastQScreen/*') from fastq_screen_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
+    file qc_thresholds from qc_thresholds_result
     file runfolder
     file config from multiqc_flowcell_config
     file assets from assets
@@ -121,7 +136,7 @@ process MultiQCPerFlowcell {
     multiqc \
         --title "Flowcell Report for ${runfolder.getFileName()}" \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -c $config \
-        --disable_clarity \
+        --disable_clarity -c $qc_thresholds \
         .
     """
 
