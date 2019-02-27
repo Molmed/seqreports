@@ -5,16 +5,35 @@ from checkQC.config import ConfigFactory
 import argparse
 import yaml
 
-def convert_to_multiqc_config(checkqc_config):
-    for qc_criteria in checkqc_config:
-        if qc_criteria['name'] == 'ClusterPFHandler':
-            bcl2fastq_total = {'total': {}}
-            if not qc_criteria['warning'] == 'unknown':
-                bcl2fastq_total['total']['warn'] = [{'lt': qc_criteria['warning']}]
-            if not qc_criteria['error'] == 'unknown':
-                bcl2fastq_total['total']['error'] = [{'lt': qc_criteria['error']}]
 
-    return {'table_cond_formatting_rules': bcl2fastq_total}
+def get_mapping_handlers():
+    multiqc_mapping = {'ClusterPFHandler':'total', #bcl2fastq
+                       'ErrorRateHandler': 'Error', #Interop
+                       'Q30Handler': 'percent_Q30', #bcl2fastq
+                       'ReadsPerSampleHandler': 'mqc-generalstats-bcl2fastq-total'} #bcl2fastq
+
+    return multiqc_mapping
+
+def get_qc_criteria(mapper,checkqc_config):#This is ugly, checkq_config is passed through convert_to_multiqc_config. Maybe it should be global in a class.
+    for handler in checkqc_config:
+        if handler['name'] == mapper:
+            return(handler)
+
+def convert_to_multiqc_config(checkqc_config):
+    mapping_handlers = get_mapping_handlers()
+    multiqc_config_format = {}
+    for mapper in mapping_handlers:
+        multiqc_name = mapping_handlers[mapper]
+        qc_criteria = get_qc_criteria(mapper,checkqc_config)
+        multiqc_config_value = {multiqc_name: {}}
+        if not qc_criteria['warning'] == 'unknown':
+            multiqc_config_value[multiqc_name]['warn'] = [{'lt': qc_criteria['warning']}]
+        if not qc_criteria['error'] == 'unknown':
+            multiqc_config_value[multiqc_name]['error'] = [{'lt': qc_criteria['error']}]
+
+        multiqc_config_format[multiqc_name] = multiqc_config_value[multiqc_name]
+
+    return {'table_cond_formatting_rules': multiqc_config_format}
 
 
 if __name__ == "__main__":
