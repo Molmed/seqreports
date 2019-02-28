@@ -19,17 +19,31 @@ def get_qc_criteria(mapper,checkqc_config):#This is ugly, checkq_config is passe
         if handler['name'] == mapper:
             return(handler)
 
+def get_qc_level(mapper):
+    #This is where we should get lt or gt.
+    warning_level = {'ClusterPFHandler':'lt',
+                     'ErrorRateHandler': 'gt',
+                     'Q30Handler': 'lt',
+                     'ReadsPerSampleHandler': 'lt'}
+
+    return warning_level[mapper]
+
+
 def convert_to_multiqc_config(checkqc_config):
     mapping_handlers = get_mapping_handlers()
+    #I dont't want to return the whole dictionary from get_mapping_handlers, but I have to iterate over it.
+    #Can I do this differently? It would be prefferd to iterate over the checkqc_config, but I don't want to use all keys
+    #so then I have to make the code handle exceptions instead. Or should it be a global variable in an __init__ together with a config-file?
     multiqc_config_format = {}
     for mapper in mapping_handlers:
         multiqc_name = mapping_handlers[mapper]
         qc_criteria = get_qc_criteria(mapper,checkqc_config)
+        qc_level = get_qc_level(mapper)
         multiqc_config_value = {multiqc_name: {}}
         if not qc_criteria['warning'] == 'unknown':
-            multiqc_config_value[multiqc_name]['warn'] = [{'lt': qc_criteria['warning']}]
+            multiqc_config_value[multiqc_name]['warn'] = [{qc_level: qc_criteria['warning']}]
         if not qc_criteria['error'] == 'unknown':
-            multiqc_config_value[multiqc_name]['error'] = [{'lt': qc_criteria['error']}]
+            multiqc_config_value[multiqc_name]['error'] = [{qc_level: qc_criteria['error']}]
 
         multiqc_config_format[multiqc_name] = multiqc_config_value[multiqc_name]
 
