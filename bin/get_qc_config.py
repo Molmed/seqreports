@@ -45,7 +45,7 @@ def convert_to_multiqc_config(checkqc_config_dict):
         if not qc_criteria['warning'] == 'unknown':
             multiqc_config_value[mapper.multiqc_mapping]['warn'] = [{mapper.compare_direction: qc_criteria['warning']}]
         if not qc_criteria['error'] == 'unknown':
-            multiqc_config_value[mapper.multiqc_mapping]['error'] = [{mapper.compare_direction: qc_criteria['error']}]
+            multiqc_config_value[mapper.multiqc_mapping]['fail'] = [{mapper.compare_direction: qc_criteria['error']}]
 
         multiqc_config_format[mapper.multiqc_mapping] = multiqc_config_value[mapper.multiqc_mapping]
 
