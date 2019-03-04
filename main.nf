@@ -5,6 +5,7 @@
 // nextflow -c config/nextflow.config run run_multiqc_nextflow.nf \
 //          --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
 //          --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
+//          --checkqc_config /home/monika/git_workspace/summary-report-development/checkqc_config_monika.yaml
 
 
 // ----------------
@@ -101,15 +102,18 @@ process FastqScreen {
 
 fastq_screen_results.into{ fastq_screen_results_for_flowcell;  fastq_screen_results_for_project_ungrouped }
 
+checkqc_config = file(params.checkqc_config)
+
 process GetQCThresholds {
   input:
   file runfolder
+  file checkqc_config
 
   output:
   file("qc_thresholds.yaml") into qc_thresholds_result
 
   """
-  /summary-report-development/bin/get_qc_config.py --runfolder $runfolder
+  /summary-report-development/bin/get_qc_config.py --runfolder $runfolder --config $checkqc_config
 
   """
 
