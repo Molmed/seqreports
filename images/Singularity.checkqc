@@ -2,5 +2,4 @@ Bootstrap: docker
 From: python:3.6-stretch
 
 %post
-  pip install checkqc
-  git clone https://github.com/Molmed/summary-report-development.git
+  pip install checkqc==3.3.1

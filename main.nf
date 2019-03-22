@@ -45,8 +45,12 @@ multiqc_project_config = file(params.multiqc_project_config)
 
 fastq_screen_db = file(params.fastq_screen_db)
 
+params.checkqc_config = ""
+
 params.assets = "assets/"
 assets = file(params.assets)
+
+get_qc_config_script = file("bin/get_qc_config.py")
 
 // ---------------------------------------------------
 // Create directories where results should be written.
@@ -102,18 +106,24 @@ process FastqScreen {
 
 fastq_screen_results.into{ fastq_screen_results_for_flowcell;  fastq_screen_results_for_project_ungrouped }
 
-checkqc_config = file(params.checkqc_config)
-
 process GetQCThresholds {
   input:
   file runfolder
-  file checkqc_config
+  file get_qc_config_script
 
   output:
   file("qc_thresholds.yaml") into qc_thresholds_result
 
+  script:
+  if (params.checkqc_config.length() > 0){
+      checkqc_config_section = "--config ${params.checkqc_config}"
+  }
+  else{
+      checkqc_config_section = ""
+  }
+
   """
-  /summary-report-development/bin/get_qc_config.py --runfolder $runfolder --config $checkqc_config
+  python $get_qc_config_script --runfolder $runfolder $checkqc_config_section
 
   """
 
@@ -138,7 +148,7 @@ process MultiQCPerFlowcell {
 
     """
     multiqc \
-        --title "Flowcell Report for ${runfolder.getFileName()}" \
+        --title "Flowcell report for ${runfolder.getFileName()}" \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -c $config \
         --disable_clarity -c $qc_thresholds \
         .
@@ -173,7 +183,7 @@ process MultiQCPerProject {
 
     """
     multiqc \
-        --title "Report for Project $project on Runfolder ${runfolder.getFileName()}" \
+        --title "Report for project $project on runfolder ${runfolder.getFileName()}" \
         -m fastqc -m fastq_screen \
         --clarity_project $project \
         -o $project \
