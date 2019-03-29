@@ -7,6 +7,7 @@ import argparse
 import os
 import json
 
+
 class RunfolderInfo():
 
     def __init__(self, runfolder):
@@ -21,7 +22,7 @@ class RunfolderInfo():
              'Flowcell': 'Flowcell type', 'FlowCellMode': 'Flowcell type',
              'ReagentKitVersion': 'Reagent kit version',
              'RTAVersion': 'RTA Version', 'RtaVersion': 'RTA Version',
-            }
+             }
 
     def find(self, d, tag):
         if tag in d:
@@ -44,7 +45,8 @@ class RunfolderInfo():
             return None
 
     def read_stats_json(self):
-        stats_json_path = os.path.join(self.runfolder, "Unaligned/Stats/Stats.json")
+        stats_json_path = os.path.join(
+            self.runfolder, "Unaligned/Stats/Stats.json")
         if os.path.exists(stats_json_path):
             with open(stats_json_path) as f:
                 return json.load(f)
@@ -81,12 +83,16 @@ class RunfolderInfo():
         results = self.get_read_cycles()
         results.update(self.get_run_parameters())
         if os.path.exists(os.path.join(self.runfolder, "bcl2fastq_version")):
-            results['bcl2fastq version'] = self.get_bcl2fastq_version(self.runfolder)
+            results['bcl2fastq version'] = self.get_bcl2fastq_version(
+                self.runfolder)
         return results
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Dumps a metadata yaml for MultiQC')
-    parser.add_argument('--runfolder', type=str, required=True, help='Path to runfolder')
+    parser = argparse.ArgumentParser(
+        description='Dumps a metadata yaml for MultiQC')
+    parser.add_argument('--runfolder', type=str,
+                        required=True, help='Path to runfolder')
 
     args = parser.parse_args()
     runfolder = args.runfolder
@@ -102,6 +108,6 @@ description: 'regarding the sequencing run'
 data: |
     <dl class="dl-horizontal">
 ''')
-    for k,v in results.items():
-        print("        <dt>{}</dt><dd><samp>{}</samp></dd>".format(k,v))
+    for k, v in results.items():
+        print("        <dt>{}</dt><dd><samp>{}</samp></dd>".format(k, v))
     print ("    </dl>")
