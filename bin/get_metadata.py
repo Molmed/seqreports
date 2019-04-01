@@ -29,8 +29,7 @@ class RunfolderInfo():
             yield d[tag]
         for k, v in d.items():
             if isinstance(v, dict):
-                for i in self.find(v, tag):
-                    yield i
+                yield from self.find(v, tag)
 
     def read_run_parameters(self):
         alt_1 = os.path.join(self.runfolder, "runParameters.xml")
