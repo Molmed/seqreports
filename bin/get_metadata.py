@@ -69,14 +69,17 @@ class RunfolderInfo():
         read_and_cycles = OrderedDict()
         read_counter = 1
         index_counter = 1
-        for read_info in self.stats_json["ReadInfosForLanes"][0]["ReadInfos"]:
-            if read_info["IsIndexedRead"]:
-                read_and_cycles[f"Index {index_counter} (bp)"] = read_info["NumCycles"]
-                index_counter += 1
-            else:
-                read_and_cycles[f"Read {read_counter} (bp)"] = read_info["NumCycles"]
-                read_counter += 1
-        return read_and_cycles
+        try:
+            for read_info in self.stats_json["ReadInfosForLanes"][0]["ReadInfos"]:
+                if read_info["IsIndexedRead"]:
+                    read_and_cycles[f"Index {index_counter} (bp)"] = read_info["NumCycles"]
+                    index_counter += 1
+                else:
+                    read_and_cycles[f"Read {read_counter} (bp)"] = read_info["NumCycles"]
+                    read_counter += 1
+            return read_and_cycles
+        except TypeError:
+            return read_and_cycles
 
     def get_info(self):
         results = self.get_read_cycles()
