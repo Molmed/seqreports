@@ -6,6 +6,7 @@
 //          --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
 //          --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
 //          --checkqc_config /home/monika/git_workspace/summary-report-development/checkqc_config_monika.yaml
+//          --bcl2fastq_outdir Unaligned
 
 
 // ----------------
@@ -45,12 +46,16 @@ multiqc_project_config = file(params.multiqc_project_config)
 
 fastq_screen_db = file(params.fastq_screen_db)
 
+params.bcl2fastq_outdir = ""
+
 params.checkqc_config = ""
 
 params.assets = "assets/"
 assets = file(params.assets)
 
 get_qc_config_script = file("bin/get_qc_config.py")
+
+get_metadata_script = file("bin/get_metadata.py")
 
 // ---------------------------------------------------
 // Create directories where results should be written.
@@ -129,6 +134,28 @@ process GetQCThresholds {
 
 }
 
+process GetMetadata {
+
+    input:
+    file get_metadata_script
+    file runfolder
+
+    output:
+    file 'sequencing_metadata_mqc.yaml' into sequencing_metadata_yaml
+
+    script:
+    if (params.bcl2fastq_outdir.length() > 0){
+        bcl2fastq_outdir_section = "--bcl2fastq-outdir ${params.bcl2fastq_outdir}"
+    }
+    else{
+        bcl2fastq_outdir_section = ""
+    }
+
+    """
+    python $get_metadata_script --runfolder $runfolder $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
+    """
+}
+
 process MultiQCPerFlowcell {
 
     publishDir file("$results_dir/flowcell_report"), mode: 'copy', overwrite: true
@@ -138,6 +165,7 @@ process MultiQCPerFlowcell {
     file (fastqscreen:'FastQScreen/*') from fastq_screen_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
     file qc_thresholds from qc_thresholds_result
+    file sequencing_metadata from sequencing_metadata_yaml
     file runfolder
     file config from multiqc_flowcell_config
     file assets from assets
@@ -149,8 +177,8 @@ process MultiQCPerFlowcell {
     """
     multiqc \
         --title "Flowcell report for ${runfolder.getFileName()}" \
-        -m fastqc -m fastq_screen -m bcl2fastq -m interop -c $config \
-        --disable_clarity -c $qc_thresholds \
+        -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \
+        -c $config --disable_clarity -c $qc_thresholds \
         .
     """
 
@@ -174,6 +202,7 @@ process MultiQCPerProject {
     set project, file(fastqc: "*") from fastqc_results_for_project_grouped_by_project
     set project_fastq_screen, file(fastqc_screen: "*") from fastq_screen_results_for_project_grouped_by_project
     file config from multiqc_project_config
+    file sequencing_metadata from sequencing_metadata_yaml
     file runfolder
     file assets from assets
 
@@ -184,7 +213,7 @@ process MultiQCPerProject {
     """
     multiqc \
         --title "Report for project $project on runfolder ${runfolder.getFileName()}" \
-        -m fastqc -m fastq_screen \
+        -m fastqc -m fastq_screen -m custom_content \
         --clarity_project $project \
         -o $project \
         -c $config \

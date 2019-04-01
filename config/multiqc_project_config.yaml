@@ -45,5 +45,8 @@ table_columns_visible:
     FastQC:
         percent_duplicates: False
 
+top_modules:
+    - 'custom_content'
+
 remove_sections:
     - 'fastqc_sequence_counts'

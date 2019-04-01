@@ -17,6 +17,7 @@ table_columns_visible:
         total_sequences: False
 
 top_modules:
+    - 'custom_content'
     - 'bcl2fastq'
     - 'interop'
 
