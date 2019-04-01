@@ -10,10 +10,10 @@ import json
 
 class RunfolderInfo():
 
-    def __init__(self, runfolder):
+    def __init__(self, runfolder, bcl2fastq_outdir):
         self.runfolder = runfolder
         self.run_parameters = self.read_run_parameters()
-        self.stats_json = self.read_stats_json()
+        self.stats_json = self.read_stats_json(bcl2fastq_outdir)
         self.description_and_identifier = OrderedDict()
         self.run_parameters_tags = \
             {'RunId': 'Run ID', 'RunID': 'Run ID',
@@ -43,9 +43,9 @@ class RunfolderInfo():
         else:
             return None
 
-    def read_stats_json(self):
+    def read_stats_json(self, bcl2fastq_outdir):
         stats_json_path = os.path.join(
-            self.runfolder, "Unaligned/Stats/Stats.json")
+            self.runfolder, bcl2fastq_outdir, "Stats/Stats.json")
         if os.path.exists(stats_json_path):
             with open(stats_json_path) as f:
                 return json.load(f)
@@ -95,11 +95,15 @@ if __name__ == "__main__":
         description='Dumps a metadata yaml for MultiQC')
     parser.add_argument('--runfolder', type=str,
                         required=True, help='Path to runfolder')
+    parser.add_argument('--bcl2fastq-outdir', type=str,
+                        default='Data/Intensities/BaseCalls',
+                        help='Path to bcl2fastq output folder relative to the runfolder')
 
     args = parser.parse_args()
     runfolder = args.runfolder
+    bcl2fastq_outdir = args.bcl2fastq_outdir
 
-    runfolder_info = RunfolderInfo(runfolder)
+    runfolder_info = RunfolderInfo(runfolder, bcl2fastq_outdir)
     results = runfolder_info.get_info()
 
     print ('''

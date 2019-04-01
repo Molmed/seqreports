@@ -6,6 +6,7 @@
 //          --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
 //          --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
 //          --checkqc_config /home/monika/git_workspace/summary-report-development/checkqc_config_monika.yaml
+//          --bcl2fastq_outdir Unaligned
 
 
 // ----------------
@@ -44,6 +45,8 @@ params.multiqc_project_config = "config/multiqc_project_config.yaml"
 multiqc_project_config = file(params.multiqc_project_config)
 
 fastq_screen_db = file(params.fastq_screen_db)
+
+params.bcl2fastq_outdir = ""
 
 params.checkqc_config = ""
 
@@ -141,8 +144,15 @@ process GetMetadata {
     file 'sequencing_metadata_mqc.yaml' into sequencing_metadata_yaml
 
     script:
+    if (params.bcl2fastq_outdir.length() > 0){
+        bcl2fastq_outdir_section = "--bcl2fastq-outdir ${params.bcl2fastq_outdir}"
+    }
+    else{
+        bcl2fastq_outdir_section = ""
+    }
+
     """
-    python $get_metadata_script --runfolder $runfolder &> sequencing_metadata_mqc.yaml
+    python $get_metadata_script --runfolder $runfolder $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
     """
 }
 
