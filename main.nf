@@ -60,7 +60,13 @@ get_metadata_script = file("bin/get_metadata.py")
 // ---------------------------------------------------
 // Create directories where results should be written.
 // ---------------------------------------------------
-results_dir = file('results')
+params.output_dir = "results"
+results_dir = file(params.output_dir)
+
+params.additional_output_dir = ""
+if (params.additional_output_dir.length()) {
+    additional_output_dir = file(params.additional_output_dir)
+}
 
 
 // ---------------------------------------------------
@@ -159,6 +165,9 @@ process GetMetadata {
 process MultiQCPerFlowcell {
 
     publishDir file("$results_dir/flowcell_report"), mode: 'copy', overwrite: true
+    publishDir path: { additional_output_dir ? "${additional_output_dir}/flowcell_report/" : "$results_dir/flowcell_report" },
+               saveAs: { additional_output_dir ? it : null },
+               mode: 'copy', overwrite: true
 
     input:
     file (fastqc:'FastQC/*') from fastqc_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
@@ -197,6 +206,9 @@ fastq_screen_results_for_project_ungrouped
 process MultiQCPerProject {
 
     publishDir file("$results_dir/projects/"), mode: 'copy', overwrite: true
+    publishDir path: { additional_output_dir ? "${additional_output_dir}/projects/" : "$results_dir/projects" },
+               saveAs: { additional_output_dir ? it : null },
+               mode: 'copy', overwrite: true
 
     input:
     set project, file(fastqc: "*") from fastqc_results_for_project_grouped_by_project
