@@ -35,14 +35,8 @@ Channel
     }
     .into{ input_fastqc; input_fastqscreen }
 
-params.fastq_screen_config = "config/fastq_screen.conf"
-fastq_screen_config = file(params.fastq_screen_config)
-
-params.multiqc_flowcell_config = "config/multiqc_flowcell_config.yaml"
-multiqc_flowcell_config = file(params.multiqc_flowcell_config)
-
-params.multiqc_project_config = "config/multiqc_project_config.yaml"
-multiqc_project_config = file(params.multiqc_project_config)
+params.config_dir = "config/"
+config_dir = file(params.config_dir)
 
 fastq_screen_db = file(params.fastq_screen_db)
 
@@ -53,9 +47,8 @@ params.checkqc_config = ""
 params.assets = "assets/"
 assets = file(params.assets)
 
-get_qc_config_script = file("bin/get_qc_config.py")
-
-get_metadata_script = file("bin/get_metadata.py")
+params.scripts_folder = "bin/"
+scripts_folder = file(params.scripts_folder)
 
 // ---------------------------------------------------
 // Create directories where results should be written.
@@ -104,14 +97,14 @@ process FastqScreen {
 
     input:
     set val(project), file(fastq_file) from input_fastqscreen
-    file config from fastq_screen_config
+    file config_dir from config_dir
     file db from fastq_screen_db
 
     output:
     set val(project), file("*_screen.{txt,html}") into fastq_screen_results
 
     """
-    fastq_screen --conf $config $fastq_file
+    fastq_screen --conf $config_dir/fastq_screen.conf $fastq_file
     """
 }
 
@@ -120,7 +113,7 @@ fastq_screen_results.into{ fastq_screen_results_for_flowcell;  fastq_screen_resu
 process GetQCThresholds {
   input:
   file runfolder
-  file get_qc_config_script
+  file scripts_folder
 
   output:
   file("qc_thresholds.yaml") into qc_thresholds_result
@@ -134,7 +127,7 @@ process GetQCThresholds {
   }
 
   """
-  python $get_qc_config_script --runfolder $runfolder $checkqc_config_section
+  python $scripts_folder/get_qc_config.py --runfolder $runfolder $checkqc_config_section
 
   """
 
@@ -143,7 +136,7 @@ process GetQCThresholds {
 process GetMetadata {
 
     input:
-    file get_metadata_script
+    file scripts_folder
     file runfolder
 
     output:
@@ -158,7 +151,7 @@ process GetMetadata {
     }
 
     """
-    python $get_metadata_script --runfolder $runfolder $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
+    python $scripts_folder/get_metadata.py --runfolder $runfolder $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
     """
 }
 
@@ -176,7 +169,7 @@ process MultiQCPerFlowcell {
     file qc_thresholds from qc_thresholds_result
     file sequencing_metadata from sequencing_metadata_yaml
     file runfolder
-    file config from multiqc_flowcell_config
+    file config_dir from config_dir
     file assets from assets
 
     output:
@@ -187,7 +180,7 @@ process MultiQCPerFlowcell {
     multiqc \
         --title "Flowcell report for ${runfolder.getFileName()}" \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \
-        -c $config --disable_clarity -c $qc_thresholds \
+        -c $config_dir/multiqc_flowcell_config.yaml --disable_clarity -c $qc_thresholds \
         .
     """
 
@@ -202,7 +195,7 @@ fastq_screen_results_for_project_ungrouped
     .groupTuple()
     .map { [it.get(0), it.get(1).flatten()] }
     .set { fastq_screen_results_for_project_grouped_by_project }
-
+    
 process MultiQCPerProject {
 
     publishDir file("$results_dir/projects/"), mode: 'copy', overwrite: true
@@ -213,7 +206,7 @@ process MultiQCPerProject {
     input:
     set project, file(fastqc: "*") from fastqc_results_for_project_grouped_by_project
     set project_fastq_screen, file(fastqc_screen: "*") from fastq_screen_results_for_project_grouped_by_project
-    file config from multiqc_project_config
+    file config_dir from config_dir
     file sequencing_metadata from sequencing_metadata_yaml
     file runfolder
     file assets from assets
@@ -228,7 +221,7 @@ process MultiQCPerProject {
         -m fastqc -m fastq_screen -m custom_content \
         --clarity_project $project \
         -o $project \
-        -c $config \
+        -c $config_dir/multiqc_project_config.yaml \
         .
     """
 
