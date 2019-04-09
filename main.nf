@@ -35,7 +35,7 @@ Channel
     }
     .into{ input_fastqc; input_fastqscreen }
 
-params.config_dir = "config/"
+params.config_dir = "$baseDir/config/"
 config_dir = file(params.config_dir)
 
 fastq_screen_db = file(params.fastq_screen_db)
@@ -44,10 +44,10 @@ params.bcl2fastq_outdir = ""
 
 params.checkqc_config = ""
 
-params.assets = "assets/"
+params.assets = "$baseDir/assets/"
 assets = file(params.assets)
 
-params.scripts_folder = "bin/"
+params.scripts_folder = "$baseDir/bin/"
 scripts_folder = file(params.scripts_folder)
 
 // ---------------------------------------------------
