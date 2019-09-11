@@ -174,11 +174,12 @@ process MultiQCPerFlowcell {
 
     output:
     file "*multiqc_report.html" into multiqc_report_per_flowcell
-    file "*_data"
+    file "*_data.zip"
 
     """
     multiqc \
         --title "Flowcell report for ${runfolder.getFileName()}" \
+        --filename "${runfolder.getFileName()}_multiqc_report" -z \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \
         -c $config_dir/multiqc_flowcell_config.yaml --disable_clarity -c $qc_thresholds \
         .
@@ -195,7 +196,7 @@ fastq_screen_results_for_project_ungrouped
     .groupTuple()
     .map { [it.get(0), it.get(1).flatten()] }
     .set { fastq_screen_results_for_project_grouped_by_project }
-    
+
 process MultiQCPerProject {
 
     publishDir file("$results_dir/projects/"), mode: 'copy', overwrite: true
@@ -213,11 +214,12 @@ process MultiQCPerProject {
 
     output:
     file "$project/*multiqc_report.html" into multiqc_report_per_project
-    file "$project/*_data"
+    file "$project/*_data.zip"
 
     """
     multiqc \
         --title "Report for project $project on runfolder ${runfolder.getFileName()}" \
+        --filename $project"_"${runfolder.getFileName()}"_multiqc_report" -z \
         -m fastqc -m fastq_screen -m custom_content \
         --clarity_project $project \
         -o $project \
