@@ -179,6 +179,7 @@ process MultiQCPerFlowcell {
     """
     multiqc \
         --title "Flowcell report for ${runfolder.getFileName()}" \
+        --ignore '*/Data/Intensities/BaseCalls/L00*' \
         --filename "${runfolder.getFileName()}_multiqc_report" -z \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \
         -c $config_dir/multiqc_flowcell_config.yaml --disable_clarity -c $qc_thresholds \
@@ -219,6 +220,7 @@ process MultiQCPerProject {
     """
     multiqc \
         --title "Report for project $project on runfolder ${runfolder.getFileName()}" \
+        --ignore '*/Data/Intensities/BaseCalls/L00*' \
         --filename $project"_"${runfolder.getFileName()}"_multiqc_report" -z \
         -m fastqc -m fastq_screen -m custom_content \
         --clarity_project $project \
