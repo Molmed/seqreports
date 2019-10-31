@@ -15,6 +15,7 @@
 
 params.runfolder = "/TestData/BaseSpace/180126_HSX122_0568_BHLFWLBBXX"
 runfolder = file(params.runfolder)
+runfolder_name = runfolder.getFileName()
 
 //Use path to fastq-file as input
 unaligned = file("$runfolder/Unaligned")
@@ -168,7 +169,8 @@ process MultiQCPerFlowcell {
     file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
     file qc_thresholds from qc_thresholds_result
     file sequencing_metadata from sequencing_metadata_yaml
-    file runfolder
+    val runfolder_name
+    file unaligned
     file config_dir from config_dir
     file assets from assets
 
@@ -178,9 +180,9 @@ process MultiQCPerFlowcell {
 
     """
     multiqc \
-        --title "Flowcell report for ${runfolder.getFileName()}" \
+        --title "Flowcell report for $runfolder_name" \
         --ignore '*/Data/Intensities/BaseCalls/L00*' \
-        --filename "${runfolder.getFileName()}_multiqc_report" -z \
+        --filename $runfolder_name"_multiqc_report" -z \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \
         -c $config_dir/multiqc_flowcell_config.yaml --disable_clarity -c $qc_thresholds \
         .
@@ -210,7 +212,8 @@ process MultiQCPerProject {
     set project_fastq_screen, file(fastqc_screen: "*") from fastq_screen_results_for_project_grouped_by_project
     file config_dir from config_dir
     file sequencing_metadata from sequencing_metadata_yaml
-    file runfolder
+    val runfolder_name
+    file unaligned
     file assets from assets
 
     output:
@@ -219,9 +222,9 @@ process MultiQCPerProject {
 
     """
     multiqc \
-        --title "Report for project $project on runfolder ${runfolder.getFileName()}" \
+        --title "Report for project $project on runfolder $runfolder_name" \
         --ignore '*/Data/Intensities/BaseCalls/L00*' \
-        --filename $project"_"${runfolder.getFileName()}"_multiqc_report" -z \
+        --filename $project"_"$runfolder_name"_multiqc_report" -z \
         -m fastqc -m fastq_screen -m custom_content \
         --clarity_project $project \
         -o $project \
