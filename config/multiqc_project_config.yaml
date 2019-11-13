@@ -15,12 +15,8 @@ clarity:
 
     report_header_info:
         Project:
-            'Application':
             'Kit for library preparation':
-            'DNA library insert size':
-            'Sequencing instrument':
-            'Read length bp':
-            'Project decription':
+            'Project name (from NGI-portal)':
 
     # TODO The sample level stats is something that we will need tp specify later.
     general_stats:
