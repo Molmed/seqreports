@@ -6,6 +6,7 @@ process fastqc {
     output:
     tuple project, path("*_fastqc.{zip,html}")
 
+    script:
     """
     fastqc -t ${task.cpus} $fastq_file
     """
@@ -19,6 +20,7 @@ process fastq_screen {
     output:
     tuple project, path("*_screen.{txt,html}")
 
+    script:
     """
     fastq_screen --conf ${params.config_dir}/fastq_screen.conf $fastq_file
     """
@@ -38,7 +40,6 @@ process get_QC_thresholds {
     } else {
         checkqc_config_section = ""
     }
-
     """
     python ${params.script_dir}/get_qc_config.py --runfolder $runfolder \\
         $checkqc_config_section
@@ -61,7 +62,6 @@ process get_metadata {
     } else {
         bcl2fastq_outdir_section = ""
     }
-
     """
     python ${params.script_dir}/get_metadata.py --runfolder $runfolder \\
         $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
@@ -76,6 +76,7 @@ process interop_summary {
     output:
     path runfolder_summary_interop
 
+    script:
     """
     summary --csv=1 $runfolder > runfolder_summary_interop
     """
@@ -101,6 +102,7 @@ process multiQC_per_flowcell {
     path "*multiqc_report.html"
     path "*_data.zip"
 
+    script:
     """
     multiqc \\
         --title "Flowcell report for ${runfolder_name}" \\
@@ -130,6 +132,7 @@ process multiQC_per_project {
     path "${project}/*multiqc_report.html"
     path "${project}/*_data.zip"
 
+    script:
     """
     multiqc \\
         --title "Report for project ${project} on runfolder ${runfolder_name}" \\
