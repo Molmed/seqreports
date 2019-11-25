@@ -1,4 +1,4 @@
-process InteropSummary {
+process interop_summary {
 
     input:
     path runfolder
@@ -11,7 +11,7 @@ process InteropSummary {
     """
 }
 
-process Fastqc {
+process fastqc {
 
     input:
     tuple project, path(fastq_file)
@@ -24,26 +24,23 @@ process Fastqc {
     """
 }
 
-process FastqScreen {
+process fastq_screen {
 
     input:
     tuple project, path(fastq_file)
-    path config_dir
-    path db
 
     output:
     tuple project, path("*_screen.{txt,html}")
 
     """
-    fastq_screen --conf $config_dir/fastq_screen.conf $fastq_file
+    fastq_screen --conf ${params.config_dir}/fastq_screen.conf $fastq_file
     """
 }
 
-process GetQCThresholds {
+process get_QC_thresholds {
 
     input:
     path runfolder
-    path scripts_folder
 
     output:
     path("qc_thresholds.yaml")
@@ -56,13 +53,13 @@ process GetQCThresholds {
     }
 
     """
-    python $scripts_folder/get_qc_config.py --runfolder $runfolder \\
+    python ${params.script_dir}/get_qc_config.py --runfolder $runfolder \\
         $checkqc_config_section
     """
 
 }
 
-process GetMetadata {
+process get_metadata {
 
     input:
     path scripts_folder
@@ -79,29 +76,26 @@ process GetMetadata {
     }
 
     """
-    python $scripts_folder/get_metadata.py --runfolder $runfolder \\
+    python ${params.script_dir}/get_metadata.py --runfolder $runfolder \\
         $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
     """
 }
 
-process MultiQCPerFlowcell {
+process multiQC_per_flowcell {
 
     // publishDir file("$results_dir/flowcell_report"), mode: 'copy', overwrite: true
     // publishDir path: { additional_output_dir ? "${additional_output_dir}/flowcell_report/" : "$results_dir/flowcell_report" },
     //            saveAs: { additional_output_dir ? it : null },
     //            mode: 'copy', overwrite: true
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
 
     input:
-    path (fastqc:'FastQC/*')
-    path (fastqscreen:'FastQScreen/*')
-    path (interop_summary:'Interop_summary/*')
+    runfolder_name
+    path ('FastQC/*')
+    path ('FastQScreen/*')
+    path ('Interop_summary/*')
     path qc_thresholds
     path sequencing_metadata
-    runfolder_name
-    path unaligned
-    path config_dir
-    path assets
 
     output:
     path "*multiqc_report.html"
@@ -109,46 +103,41 @@ process MultiQCPerFlowcell {
 
     """
     multiqc \\
-        --title "Flowcell report for $runfolder_name" \\
-        --ignore '*/Data/Intensities/BaseCalls/L00*' \\
-        --filename $runfolder_name"_multiqc_report" -z \\
+        --title "Flowcell report for ${runfolder_name}" \\
+        --filename ${runfolder_name}_multiqc_report -z \\
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \\
-        -c $config_dir/multiqc_flowcell_config.yaml --disable_clarity -c $qc_thresholds \\
+        -c ${params.config_dir}/multiqc_flowcell_config.yaml --disable_clarity \\
+        -c ${qc_thresholds} \\
         .
     """
 
 }
 
-process MultiQCPerProject {
+process multiQC_per_project {
 
     // publishDir file("$results_dir/projects/"), mode: 'copy', overwrite: true
     // publishDir path: { additional_output_dir ? "${additional_output_dir}/projects/" : "$results_dir/projects" },
     //            saveAs: { additional_output_dir ? it : null },
     //            mode: 'copy', overwrite: true
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
 
     input:
-    tuple project, path(fastqc: "*")
-    tuple project_fastq_screen, path(fastqc_screen: "*")
-    path config_dir
-    path sequencing_metadata
     runfolder_name
-    path unaligned
-    path assets
+    tuple project, path("FastQC/*"), path("FastqScreen/*")
+    path sequencing_metadata
 
     output:
-    path "$project/*multiqc_report.html"
-    path "$project/*_data.zip"
+    path "${project}/*multiqc_report.html"
+    path "${project}/*_data.zip"
 
     """
     multiqc \\
-        --title "Report for project $project on runfolder $runfolder_name" \\
-        --ignore '*/Data/Intensities/BaseCalls/L00*' \\
-        --filename $project"_"$runfolder_name"_multiqc_report" -z \\
+        --title "Report for project ${project} on runfolder ${runfolder_name}" \\
+        --filename ${project}_${runfolder_name}_multiqc_report -z \\
         -m fastqc -m fastq_screen -m custom_content \\
-        --clarity_project $project \\
-        -o $project \\
-        -c $config_dir/multiqc_project_config.yaml \\
+        --clarity_project ${project} \\
+        -o ${project} \\
+        -c ${params.config_dir}/multiqc_project_config.yaml \\
         .
     """
 
