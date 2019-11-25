@@ -1,16 +1,3 @@
-process interop_summary {
-
-    input:
-    path runfolder
-
-    output:
-    path runfolder_summary_interop
-
-    """
-    summary --csv=1 $runfolder > runfolder_summary_interop
-    """
-}
-
 process fastqc {
 
     input:
@@ -78,6 +65,19 @@ process get_metadata {
     """
     python ${params.script_dir}/get_metadata.py --runfolder $runfolder \\
         $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
+    """
+}
+
+process interop_summary {
+
+    input:
+    path runfolder
+
+    output:
+    path runfolder_summary_interop
+
+    """
+    summary --csv=1 $runfolder > runfolder_summary_interop
     """
 }
 
