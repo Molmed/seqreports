@@ -1,21 +1,66 @@
-// This is a simple nextflow script that runs interop_summary,fastqc, and fastqscreen on a runfolder.
-// The result is passed on to a process creating a multiqc report that finally is copied to a results directory
-// The script assumes nextflow to be available in PATH and that Singularity images are defined in nextflow.config.
-// Use the following command to run the script
-// nextflow -c config/nextflow.config run run_multiqc_nextflow.nf \
-//          --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
-//          --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
-//          --checkqc_config /home/monika/git_workspace/summary-report-development/checkqc_config_monika.yaml
-//          --bcl2fastq_outdir Unaligned
+#! /usr/bin/env nextflow
 
+nextflow.preview.dsl=2
 
-// ----------------
-// Input parameters
-// ----------------
+/* ####################################################
+
+   SNP & SEQ Run QC pipeline
+
+   #################################################### */
+
+def helpMessage() {
+
+    log.info """
+
+    SNP & SEQ Runfolder QC pipeline.
+
+    This workflow runs the following tools on a runfolder:
+        * InterOp summary    (http://illumina.github.io/interop/example_summary.html)
+        * FastQC             (https://www.bioinformatics.babraham.ac.uk/projects/fastqc/)
+        * FastqScreen        (https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/)
+        * CheckQC            (https://github.com/Molmed/checkQC)
+        * MultiQC            (https://multiqc.info/)
+
+    Usage:
+        # Using parameters supplied in a config
+        nextflow run -c custom.config -profile snpseq main.nf
+
+        # Using parameters supplied on the command line
+        nextflow run -profile snpseq main.nf \
+            --runfolder '/path/to/runfolder' \
+            --fastqscreen_databases '/path/to/databases' \
+            --checkqc_config '/path/to/checkqc.config' \
+            --bcl2fastq_outdir 'Unaligned'
+
+    Notes:
+        * Always quote paths which are parameters to nextflow e.g. '/path/to/file'
+
+    """
+}
+
+if (params.help){
+    helpMessage()
+    exit 0
+}
+
 
 params.runfolder = "/TestData/BaseSpace/180126_HSX122_0568_BHLFWLBBXX"
 runfolder = file(params.runfolder)
 runfolder_name = runfolder.getFileName()
+params.config_dir = "$baseDir/config/"
+config_dir = file(params.config_dir)
+
+fastq_screen_db = file(params.fastq_screen_db)
+
+params.bcl2fastq_outdir = ""
+
+params.checkqc_config = ""
+
+params.assets = "$baseDir/assets/"
+assets = file(params.assets)
+
+params.scripts_folder = "$baseDir/bin/"
+scripts_folder = file(params.scripts_folder)
 
 //Use path to fastq-file as input
 unaligned = file("$runfolder/Unaligned")
@@ -36,20 +81,6 @@ Channel
     }
     .into{ input_fastqc; input_fastqscreen }
 
-params.config_dir = "$baseDir/config/"
-config_dir = file(params.config_dir)
-
-fastq_screen_db = file(params.fastq_screen_db)
-
-params.bcl2fastq_outdir = ""
-
-params.checkqc_config = ""
-
-params.assets = "$baseDir/assets/"
-assets = file(params.assets)
-
-params.scripts_folder = "$baseDir/bin/"
-scripts_folder = file(params.scripts_folder)
 
 // ---------------------------------------------------
 // Create directories where results should be written.
@@ -62,99 +93,124 @@ if (params.additional_output_dir.length()) {
     additional_output_dir = file(params.additional_output_dir)
 }
 
+// Workflow
+
+/* Workflow Graph
+
+Runfolder -> InterOp                    -> MultiQCPerFlowcell
+    |     -> GetQCThresholds            -> MultiQCPerFlowcell
+    |     -> GetMetaData                -> MultiQCPerFlowcell + MultiQCPerProject
+    |
+    \ -> "Underminded" -> FastQC        -> MultiQCPerFlowcell + MultiQCPerProject
+                       -> FastqScreen   -> MultiQCPerFlowcell + MultiQCPerProject
+*/
+
+workflow {
+
+    main:
+    getRunFolder(params.runfolder) | checkRunQuality
+
+    publish:
+    //checkRunQuality.out.interop_summary    to: "${params.results}/interop_summary"
+    //checkRunQuality.out.fastqc             to: "${params.results}/fastqc"
+    //checkRunQuality.out.fastqscreen        to: "${params.results}/fastqscreen"
+    checkRunQuality.out.project_multiqc            to: "${params.results}/multiqc"
+    checkRunQuality.out.flowcell_multiqc           to: "${params.results}/multiqc"
+
+}
+
+workflow.onComplete {
+	log.info ( workflow.success ? "\nDone! Open the reports in your browser.\n" : "Oops .. something went wrong." )
+}
 
 // ---------------------------------------------------
 // Processes
 // ---------------------------------------------------
-process InteropSummary {
+// process InteropSummary {
+//
+//     input:
+//     file runfolder
+//
+//     output:
+//     file runfolder_summary_interop into interop_summary_results
+//
+//     """
+//     summary --csv=1 $runfolder > runfolder_summary_interop
+//     """
+// }
 
-    input:
-    file runfolder
+// process Fastqc {
+//
+//     input:
+//     set val(project), file(fastq_file) from input_fastqc
+//
+//     output:
+//     set val(project), file("*_fastqc.{zip,html}") into (fastqc_results_for_flowcell,fastqc_results_for_project_ungrouped)
+//
+//     """
+//     fastqc $fastq_file
+//     """
+// }
 
-    output:
-    file runfolder_summary_interop into interop_summary_results
+// process FastqScreen {
+//
+//     input:
+//     set val(project), file(fastq_file) from input_fastqscreen
+//     file config_dir from config_dir
+//     file db from fastq_screen_db
+//
+//     output:
+//     set val(project), file("*_screen.{txt,html}") into (fastq_screen_results_for_flowcell,fastq_screen_results_for_project_ungrouped)
+//
+//     """
+//     fastq_screen --conf $config_dir/fastq_screen.conf $fastq_file
+//     """
+// }
 
-    """
-    summary --csv=1 $runfolder > runfolder_summary_interop
-    """
-}
+// process GetQCThresholds {
+//   input:
+//   file runfolder
+//   file scripts_folder
+//
+//   output:
+//   file("qc_thresholds.yaml") into qc_thresholds_result
+//
+//   script:
+//   if (params.checkqc_config.length() > 0){
+//       checkqc_config_section = "--config ${params.checkqc_config}"
+//   }
+//   else{
+//       checkqc_config_section = ""
+//   }
+//
+//   """
+//   python $scripts_folder/get_qc_config.py --runfolder $runfolder $checkqc_config_section
+//
+//   """
+//
+// }
 
-process Fastqc {
-
-    input:
-    set val(project), file(fastq_file) from input_fastqc
-
-    output:
-    set val(project), file("*_fastqc.{zip,html}") into fastqc_results
-
-    """
-    fastqc $fastq_file
-    """
-}
-
-fastqc_results.into{ fastqc_results_for_flowcell;  fastqc_results_for_project_ungrouped }
-
-process FastqScreen {
-
-    input:
-    set val(project), file(fastq_file) from input_fastqscreen
-    file config_dir from config_dir
-    file db from fastq_screen_db
-
-    output:
-    set val(project), file("*_screen.{txt,html}") into fastq_screen_results
-
-    """
-    fastq_screen --conf $config_dir/fastq_screen.conf $fastq_file
-    """
-}
-
-fastq_screen_results.into{ fastq_screen_results_for_flowcell;  fastq_screen_results_for_project_ungrouped }
-
-process GetQCThresholds {
-  input:
-  file runfolder
-  file scripts_folder
-
-  output:
-  file("qc_thresholds.yaml") into qc_thresholds_result
-
-  script:
-  if (params.checkqc_config.length() > 0){
-      checkqc_config_section = "--config ${params.checkqc_config}"
-  }
-  else{
-      checkqc_config_section = ""
-  }
-
-  """
-  python $scripts_folder/get_qc_config.py --runfolder $runfolder $checkqc_config_section
-
-  """
-
-}
-
-process GetMetadata {
-
-    input:
-    file scripts_folder
-    file runfolder
-
-    output:
-    file 'sequencing_metadata_mqc.yaml' into sequencing_metadata_yaml
-
-    script:
-    if (params.bcl2fastq_outdir.length() > 0){
-        bcl2fastq_outdir_section = "--bcl2fastq-outdir ${params.bcl2fastq_outdir}"
-    }
-    else{
-        bcl2fastq_outdir_section = ""
-    }
-
-    """
-    python $scripts_folder/get_metadata.py --runfolder $runfolder $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
-    """
-}
+// process GetMetadata {
+//
+//     input:
+//     file scripts_folder
+//     file runfolder
+//
+//     output:
+//     file 'sequencing_metadata_mqc.yaml' into sequencing_metadata_yaml
+//
+//     script:
+//     if (params.bcl2fastq_outdir.length() > 0){
+//         bcl2fastq_outdir_section = "--bcl2fastq-outdir ${params.bcl2fastq_outdir}"
+//     }
+//     else{
+//         bcl2fastq_outdir_section = ""
+//     }
+//
+//     """
+//     python $scripts_folder/get_metadata.py --runfolder $runfolder $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
+//     """
+// }
 
 process MultiQCPerFlowcell {
 
