@@ -20,7 +20,7 @@ process fastqc {
     tuple project, path("*_fastqc.{zip,html}")
 
     """
-    fastqc $fastq_file
+    fastqc -t ${task.cpus} $fastq_file
     """
 }
 
