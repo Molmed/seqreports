@@ -60,13 +60,13 @@ workflow check_run_quality {
         project_and_reads = get_project_and_reads(run_folder)
         fastqc(project_and_reads)
         fastq_screen(project_and_reads)
-        multiqc_per_flowcell( path(params.run_folder).getFileName(),
+        multiqc_per_flowcell( params.run_folder,
             fastqc.out.map{ it[1] }.collect().ifEmpty([]),
             fastq_screen.out.map{ it[1] }.collect().ifEmpty([]),
             interop_summary.out.map{ it[1] }.collect().ifEmpty([]),
             get_QC_thresholds.out.collect(),
             get_metadata.out.collect())
-        multiqc_per_project( path(params.run_folder).getFileName(),
+        multiqc_per_project( params.run_folder,
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
             get_metadata.out.collect())
 
