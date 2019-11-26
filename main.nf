@@ -7,6 +7,17 @@ nextflow.preview.dsl=2
 
    #################################################### */
 
+// Pipeline parameters
+params.run_folder = ""
+params.result_dir = "results"
+params.additional_result_dir = ""
+params.bcl2fastq_outdir = ""
+params.checkqc_config = ""                       // See: https://github.com/Molmed/checkQC
+params.assets_dir = "$baseDir/assets"
+params.config_dir = "$baseDir/config"
+params.script_dir = "$baseDir/bin"
+params.help = false
+
 def helpMessage() {
 
     log.info """
@@ -31,28 +42,33 @@ def helpMessage() {
             --checkqc_config '/path/to/checkqc.config' \
             --bcl2fastq_outdir 'Unaligned'
 
+    Mandatory parameters:
+        --run_folder                        The folder to quality check
+
+    Optional parameters:
+        --result_dir                        Path to write results (default: results)
+        --additional_result_dir             Additional path to write results.
+        --bcl2fastq_outdir
+        --checkqc_config
+        --assets_dir
+        --config_dir
+        --script_dir
+
+        --help                              Print this help message.
+
     Notes:
         * Always quote paths that are parameters to nextflow e.g. '/path/to/file'
 
     """
 }
 
-if (params.help){
+if (params.help || !params.run_folder){
     helpMessage()
     exit 0
 }
 
 // parameters
 // params.run_folder = "/TestData/BaseSpace/180126_HSX122_0568_BHLFWLBBXX"
-params.run_folder = ""
-params.result_dir = "results"
-params.additional_result_dir = ""
-params.bcl2fastq_outdir = ""
-params.checkqc_config = ""                       // See: https://github.com/Molmed/checkQC
-params.assets_dir = "$baseDir/assets"
-params.config_dir = "$baseDir/config"
-params.script_dir = "$baseDir/bin"
-params.help = false
 // runfolder = file(params.runfolder)
 // runfolder_name = runfolder.getFileName()
 // config_dir = file(params.config_dir)
