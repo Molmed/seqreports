@@ -1,6 +1,6 @@
 nextflow.preview.dsl=2
 
-include 'processes.nf' params(params)
+include './processes.nf' params(params)
 
 def get_run_folder(run_folder) {
 

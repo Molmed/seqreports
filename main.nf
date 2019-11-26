@@ -82,7 +82,7 @@ params.script_dir = "$baseDir/bin"
 //     }
 //     .into{ input_fastqc; input_fastqscreen }
 
-include 'library.nf' params(params)
+include './library.nf' params(params)
 
 workflow {
 
