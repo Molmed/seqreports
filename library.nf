@@ -15,7 +15,7 @@ def get_project_and_reads(run_folder) {
         .fromPath("${run_folder}/Unaligned/**.fastq.gz", maxDepth: 5 )
         .filter( ~/^.*_[^I]\d_001\.fastq\.gz$/ )
         .map {
-            it.toString.startsWith('Undetermined')?
+            it.toString.indexOf('Undetermined') > 0 ?
                 ['NoProject', it] :
                 [(it.toString() =~ /^.*\/Unaligned\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
             // path = file(it)
