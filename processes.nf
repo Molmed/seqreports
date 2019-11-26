@@ -83,7 +83,7 @@ process interop_summary {
     """
 }
 
-process multiQC_per_flowcell {
+process multiqc_per_flowcell {
 
     // publishDir file("$results_dir/flowcell_report"), mode: 'copy', overwrite: true
     // publishDir path: { additional_output_dir ? "${additional_output_dir}/flowcell_report/" : "$results_dir/flowcell_report" },
@@ -116,7 +116,7 @@ process multiQC_per_flowcell {
 
 }
 
-process multiQC_per_project {
+process multiqc_per_project {
 
     // publishDir file("$results_dir/projects/"), mode: 'copy', overwrite: true
     // publishDir path: { additional_output_dir ? "${additional_output_dir}/projects/" : "$results_dir/projects" },
