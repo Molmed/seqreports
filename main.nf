@@ -1,7 +1,6 @@
 #! /usr/bin/env nextflow
 
 nextflow.preview.dsl=2
-
 /* ####################################################
 
    SNP & SEQ Run folder QC pipeline
@@ -53,6 +52,7 @@ params.checkqc_config = ""                       // See: https://github.com/Molm
 params.assets_dir = "$baseDir/assets"
 params.config_dir = "$baseDir/config"
 params.script_dir = "$baseDir/bin"
+params.help = false
 // runfolder = file(params.runfolder)
 // runfolder_name = runfolder.getFileName()
 // config_dir = file(params.config_dir)
