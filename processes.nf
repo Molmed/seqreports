@@ -22,7 +22,8 @@ process fastq_screen {
 
     script:
     """
-    fastq_screen --conf ${params.config_dir}/fastq_screen.conf $fastq_file
+    sed -E 's/^(THREADS[[:blank:]]+)[[:digit:]]+/\1${task.cpus}/' ${params.config_dir}/fastq_screen.conf > fastq_screen.conf
+    fastq_screen --conf fastq_screen.conf $fastq_file
     """
 }
 
