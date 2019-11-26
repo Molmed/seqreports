@@ -52,7 +52,6 @@ process get_QC_thresholds {
 process get_metadata {
 
     input:
-    path scripts_folder
     path runfolder
 
     output:
