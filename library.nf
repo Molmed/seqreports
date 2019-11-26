@@ -17,7 +17,7 @@ def get_project_and_reads(run_folder) {
         .map {
             it.toString.startsWith('Undetermined')?
                 ['NoProject', it] :
-                [(path =~ /^.*\/Unaligned\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
+                [(it.toString() =~ /^.*\/Unaligned\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
             // path = file(it)
             // if (path.getFileName().toString().startsWith('Undetermined')){
             //     ['NoProject', path]
