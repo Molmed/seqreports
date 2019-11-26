@@ -4,7 +4,7 @@ include './processes.nf' params(params)
 
 def get_run_folder(run_folder) {
 
-    Channel.value(path(run_folder))
+    Channel.value(file(run_folder))
         .ifEmpty { "Error: No run folder (--run_folder) given."; exit 1 }
 
 }
