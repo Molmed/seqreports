@@ -1,7 +1,5 @@
 # summary-report-development
-In this repository we will gather useful scripts that can be used in the process of developing new sequencing report at the SNP&amp;Seq Technology platform.
-
-This repository is not a repository for the final product and the final code. This is just a place to share scripts and ideas during the development process.
+This is a nextflow pipeline for generating sequencing reports for the SNP&amp;Seq Technology platform, NGI Uppsala, SciLifelab Genomics.
 
 # Pre-requisites
 You need to:
@@ -26,3 +24,17 @@ nextflow -c config/nextflow.config run main.nf \
           --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
           --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
 ```
+
+## Profiles
+There are three different config profiles:
+- `standard`: For running locally
+- `dev`: Like standard but with less memory
+- `slurm`: For running on a server with the job scheduler slurm
+
+Usage:
+```
+nextflow run main.nf -profile dev <rest of the options>
+```
+
+### slurm profile
+When using slurm, use the `--project` parameter to specify which project should be accounted for the running time
