@@ -29,12 +29,12 @@ nextflow -c config/nextflow.config run main.nf \
 There are three different config profiles:
 - `standard`: For running locally
 - `dev`: Like standard but with less memory
-- `slurm`: For running on a server with the job scheduler slurm
+- `uppmax`: For running on an uppmax cluster with slurm
 
 Usage:
 ```
 nextflow run main.nf -profile dev <rest of the options>
 ```
 
-### slurm profile
-When using slurm, use the `--project` parameter to specify which project should be accounted for the running time
+### uppmax profile
+When using uppmax, use the `--project` parameter to specify which project should be accounted for the running time
