@@ -200,6 +200,12 @@ fastq_screen_results_for_project_ungrouped
     .map { [it.get(0), it.get(1).flatten()] }
     .set { fastq_screen_results_for_project_grouped_by_project }
 
+fastqc_results_for_project_grouped_by_project
+    .mix(fastq_screen_results_for_project_grouped_by_project)
+    .groupTuple()
+    .map { it -> tuple(it[0],it[1][0],it[1][1])}
+    .set { project_results }
+
 process MultiQCPerProject {
 
     publishDir file("$results_dir/projects/"), mode: 'copy', overwrite: true
@@ -208,8 +214,7 @@ process MultiQCPerProject {
                mode: 'copy', overwrite: true
 
     input:
-    set project, file(fastqc: "*") from fastqc_results_for_project_grouped_by_project
-    set project_fastq_screen, file(fastqc_screen: "*") from fastq_screen_results_for_project_grouped_by_project
+    set project, file('fastqc/*'), file('fastqscreen/*') from project_results
     file config_dir from config_dir
     file sequencing_metadata from sequencing_metadata_yaml
     val runfolder_name
