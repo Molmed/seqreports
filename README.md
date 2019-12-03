@@ -29,12 +29,12 @@ nextflow -c config/nextflow.config run main.nf \
 There are three different config profiles:
 - `standard`: For running locally
 - `dev`: Like standard but with less memory
-- `uppmax`: For running on an uppmax cluster with slurm
+- `irma`: For running on uppmax cluster irma with slurm
 
 Usage:
 ```
 nextflow run main.nf -profile dev <rest of the options>
 ```
 
-### uppmax profile
-When using uppmax, use the `--project` parameter to specify which project should be accounted for the running time
+### irma profile
+When using the irma profile, use the `--project` parameter to specify which project should be accounted for the running time
