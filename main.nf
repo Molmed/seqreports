@@ -229,7 +229,7 @@ process MultiQCPerProject {
     multiqc \
         --title "Report for project $project on runfolder $runfolder_name" \
         --ignore '*/Data/Intensities/BaseCalls/L00*' \
-        --filename $project"_"$runfolder_name"_multiqc_report" -z \
+        --filename $runfolder_name"_"$project"_multiqc_report" -z \
         -m fastqc -m fastq_screen -m custom_content \
         -o $project \
         -c $config_dir/multiqc_project_config.yaml \
