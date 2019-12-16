@@ -36,10 +36,10 @@ def helpMessage() {
         nextflow run -c custom.config -profile snpseq main.nf
 
         # Using parameters supplied on the command line
-        nextflow run -profile snpseq main.nf \
-            --runfolder '/path/to/runfolder' \
-            --fastqscreen_databases '/path/to/databases' \
-            --checkqc_config '/path/to/checkqc.config' \
+        nextflow run -profile snpseq main.nf \\
+            --runfolder '/path/to/runfolder' \\
+            --fastqscreen_databases '/path/to/databases' \\
+            --checkqc_config '/path/to/checkqc.config' \\
             --bcl2fastq_outdir 'Unaligned'
 
     Mandatory parameters:
