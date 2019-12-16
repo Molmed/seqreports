@@ -92,7 +92,7 @@ process multiqc_per_flowcell {
     // errorStrategy 'ignore'
 
     input:
-    runfolder_name
+    val runfolder_name
     path ('FastQC/*')
     path ('FastQScreen/*')
     path ('Interop_summary/*')
@@ -125,7 +125,7 @@ process multiqc_per_project {
     // errorStrategy 'ignore'
 
     input:
-    runfolder_name
+    val runfolder_name
     tuple project, path("FastQC/*"), path("FastqScreen/*")
     path sequencing_metadata
 

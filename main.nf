@@ -106,11 +106,8 @@ workflow {
     get_run_folder(params.run_folder) | check_run_quality
 
     publish:
-    //checkRunQuality.out.interop_summary    to: "${params.results}/interop_summary"
-    //checkRunQuality.out.fastqc             to: "${params.results}/fastqc"
-    //checkRunQuality.out.fastqscreen        to: "${params.results}/fastqscreen"
-    checkRunQuality.out.project_multiqc            to: "${params.result_dir}/multiqc_by_flowcell"
-    checkRunQuality.out.flowcell_multiqc           to: "${params.result_dir}/multiqc_by_project"
+    check_run_quality.out.multiqc_per_project            to: "${params.result_dir}/multiqc_by_flowcell"
+    check_run_quality.out.multiqc_per_flowcell           to: "${params.result_dir}/multiqc_by_project"
 
 }
 
