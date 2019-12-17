@@ -73,8 +73,8 @@ workflow {
     get_run_folder(params.run_folder) | check_run_quality
 
     publish:
-    check_run_quality.out.multiqc_per_project            to: "${params.result_dir}/multiqc_by_flowcell"
-    check_run_quality.out.multiqc_per_flowcell           to: "${params.result_dir}/multiqc_by_project"
+    check_run_quality.out.projectqc            to: "${params.result_dir}/multiqc_by_flowcell"
+    check_run_quality.out.flowcellqc           to: "${params.result_dir}/multiqc_by_project"
 
 }
 
@@ -92,7 +92,7 @@ def get_run_folder(run_folder) {
 def get_project_and_reads(run_folder) {
 
     Channel
-        .fromPath("${run_folder}/Unaligned/**.fastq.gz", maxDepth: 5 )
+        .fromPath("${run_folder}/Unaligned/**.fastq.gz", maxDepth: 10 )
         .filter( ~/^.*_[^I]\d_001\.fastq\.gz$/ )
         .map {
             it.toString.indexOf('Undetermined') > 0 ?
@@ -140,6 +140,10 @@ workflow check_run_quality {
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
             get_metadata.out.collect())
 
+    emit:
+        flowcellqc = multiqc_per_flowcell.out
+        projectqc = multiqc_per_project.out
+
 }
 
 // ---------------------------------------------------
@@ -182,7 +186,7 @@ process get_QC_thresholds {
     path runfolder
 
     output:
-    path("qc_thresholds.yaml")
+    path "qc_thresholds.yaml"
 
     script:
     if ( params.checkqc_config ){
@@ -223,7 +227,7 @@ process interop_summary {
     path runfolder
 
     output:
-    path runfolder_summary_interop
+    path 'runfolder_summary_interop'
 
     script:
     """
@@ -242,14 +246,14 @@ process multiqc_per_flowcell {
     path sequencing_metadata
 
     output:
-    path "*multiqc_report.html"
-    path "*_data.zip"
+    tuple path("*multiqc_report.html"), path("*_data.zip")
 
     script:
     """
+    RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
-        --title "Flowcell report for ${runfolder_name}" \\
-        --filename ${runfolder_name}_multiqc_report -z \\
+        --title "Flowcell report for \${RUNFOLDER}" \\
+        --filename \${RUNFOLDER}_multiqc_report.html -z \\
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \\
         -c ${params.config_dir}/multiqc_flowcell_config.yaml --disable_clarity \\
         -c ${qc_thresholds} \\
@@ -266,14 +270,14 @@ process multiqc_per_project {
     path sequencing_metadata
 
     output:
-    path "${project}/*multiqc_report.html"
-    path "${project}/*_data.zip"
+    tuple path("${project}/*multiqc_report.html"), path("${project}/*_data.zip")
 
     script:
     """
+    RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
-        --title "Report for project ${project} on runfolder ${runfolder_name}" \\
-        --filename ${project}_${runfolder_name}_multiqc_report -z \\
+        --title "Report for project ${project} on runfolder \${RUNFOLDER}" \\
+        --filename ${project}_\${RUNFOLDER}_multiqc_report.html -z \\
         -m fastqc -m fastq_screen -m custom_content \\
         --clarity_project ${project} \\
         -o ${project} \\
