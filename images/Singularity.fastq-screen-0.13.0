@@ -2,7 +2,7 @@ bootstrap: docker
 from: nfcore/base:latest
 
 %environment
-export PATH=/opt/conda/envs/bwa_samtools/bin:$PATH
+export PATH=/opt/conda/envs/fastq_screen/bin:$PATH
 
 %post
 cat > environment.yml <<ENDCONDAENV
