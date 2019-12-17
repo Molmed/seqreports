@@ -93,10 +93,11 @@ def get_project_and_reads(run_folder) {
 
     Channel
         .fromPath("${run_folder}/Unaligned/**.fastq.gz", maxDepth: 10 )
-        .filter( ~/^.*_[^I]\d_001\.fastq\.gz$/ )
+        .filter( ~/.*_[^I]\d_001\.fastq\.gz$/ )
+        .view()
         .ifEmpty { "Error: No fastq files found under ${run_folder}/ !\n"; exit 1 }
         .map {
-            it.toString.indexOf('Undetermined') > 0 ?
+            it.toString().indexOf('Undetermined') > 0 ?
                 ['NoProject', it] :
                 [(it.toString() =~ /^.*\/Unaligned\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
         }
@@ -128,7 +129,7 @@ workflow check_run_quality {
         interop_summary(run_folder)
         get_QC_thresholds(run_folder)
         get_metadata(run_folder)
-        project_and_reads = get_project_and_reads(run_folder)
+        project_and_reads = get_project_and_reads(params.run_folder)
         fastqc(project_and_reads)
         fastq_screen(project_and_reads)
         multiqc_per_flowcell( params.run_folder,
