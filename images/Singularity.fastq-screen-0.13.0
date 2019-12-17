@@ -1,0 +1,23 @@
+bootstrap: docker
+from: nfcore/base:latest
+
+%environment
+export PATH=/opt/conda/envs/bwa_samtools/bin:$PATH
+
+%post
+cat > environment.yml <<ENDCONDAENV
+# conda env create -f environment.yml
+name: fastq_screen
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+
+dependencies:
+  - bowtie2=2.3.5
+  - samtools=1.9
+  - fastq-screen=0.13.0
+ENDCONDAENV
+/opt/conda/bin/conda env create -f /environment.yml
+/opt/conda/bin/conda clean -a
+
