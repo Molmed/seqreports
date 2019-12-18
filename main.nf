@@ -182,7 +182,7 @@ process fastq_screen {
     if [ ! -e "${params.fastqscreen_databases}" ]; then
         fastq_screen --get_genomes
     elif [ "${params.fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
-        sed -i 's/${fastqscreen_default_databases}/${params.fastqscreen_databases}' fastq_screen.conf
+        sed -i 's/${fastqscreen_default_databases}/${params.fastqscreen_databases}/' fastq_screen.conf
     fi 
     fastq_screen --conf fastq_screen.conf $fastq_file
     """
