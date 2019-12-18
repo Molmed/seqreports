@@ -95,7 +95,6 @@ def get_project_and_reads(run_folder) {
     Channel
         .fromPath("${run_folder}/Unaligned/**.fastq.gz", maxDepth: 10 )
         .filter( ~/.*_[^I]\d_001\.fastq\.gz$/ )
-        .view()
         .ifEmpty { "Error: No fastq files found under ${run_folder}/ !\n"; exit 1 }
         .map {
             it.toString().indexOf('Undetermined') > 0 ?
