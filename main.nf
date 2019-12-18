@@ -10,7 +10,8 @@ nextflow.preview.dsl=2
 // Pipeline parameters
 params.run_folder = ""
 params.result_dir = "results"
-params.fastqscreen_databases = "FastQ_Screen_Genomes"
+fastqscreen_default_databases = "FastQ_Screen_Genomes"
+params.fastqscreen_databases = fastqscreen_default_databases
 params.bcl2fastq_outdir = ""
 params.checkqc_config = ""                       // See: https://github.com/Molmed/checkQC
 params.assets_dir = "$baseDir/assets"
@@ -180,7 +181,9 @@ process fastq_screen {
         ${params.config_dir}/fastq_screen.conf > fastq_screen.conf
     if [ ! -e "${params.fastqscreen_databases}" ]; then
         fastq_screen --get_genomes
-    fi
+    elif [ "${params.fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
+        sed -i 's/${fastqscreen_default_databases}/${params.fastqscreen_databases}' fastq_screen.conf
+    fi 
     fastq_screen --conf fastq_screen.conf $fastq_file
     """
 }
