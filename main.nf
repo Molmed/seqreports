@@ -12,7 +12,7 @@ params.run_folder = ""
 params.result_dir = "results"
 fastqscreen_default_databases = "FastQ_Screen_Genomes"
 params.fastqscreen_databases = fastqscreen_default_databases
-params.bcl2fastq_outdir = ""
+params.bcl2fastq_outdir = "Unaligned"
 params.checkqc_config = ""                       // See: https://github.com/Molmed/checkQC
 params.assets_dir = "$baseDir/assets"
 params.config_dir = "$baseDir/config"
@@ -48,8 +48,7 @@ def helpMessage() {
 
     Optional parameters:
         --result_dir                        Path to write results (default: results)
-        --additional_result_dir             Additional path to write results.
-        --bcl2fastq_outdir
+        --bcl2fastq_outdir                  Foldername to check for fastq.gz files (default: Unaligned)
         --checkqc_config
         --assets_dir
         --config_dir
@@ -93,7 +92,7 @@ def get_run_folder(run_folder) {
 def get_project_and_reads(run_folder) {
 
     Channel
-        .fromPath("${run_folder}/Unaligned/**.fastq.gz", maxDepth: 10 )
+        .fromPath("${run_folder}/${params.bcl2fastq_outdir}/**.fastq.gz", maxDepth: 10 )
         .filter( ~/.*_[^I]\d_001\.fastq\.gz$/ )
         .ifEmpty { "Error: No fastq files found under ${run_folder}/ !\n"; exit 1 }
         .map {
