@@ -10,7 +10,6 @@ nextflow.preview.dsl=2
 // Pipeline parameters
 params.run_folder = ""
 params.result_dir = "results"
-params.additional_result_dir = ""
 params.bcl2fastq_outdir = ""
 params.checkqc_config = ""                       // See: https://github.com/Molmed/checkQC
 params.assets_dir = "$baseDir/assets"
