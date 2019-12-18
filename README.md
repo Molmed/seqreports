@@ -21,8 +21,14 @@ fastq-screen containers, so this is a temporary workaround for that. Here's how 
 
 # How to run the nextflow pipeline
 Awesome, you're all set! Let's try generating reports for your favourite runfolder:
-```
-nextflow -c config/nextflow.config run main.nf \
-          --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
-          --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
+```bash
+        # Using parameters supplied in a config
+        nextflow run -c custom.config -profile snpseq main.nf
+
+        # Using parameters supplied on the command line
+        nextflow run -profile snpseq main.nf \
+            --run_folder '/path/to/runfolder' \
+            --fastqscreen_databases '/path/to/databases' \
+            --checkqc_config '/path/to/checkqc.config' \
+            --bcl2fastq_outdir 'Unaligned'
 ```
