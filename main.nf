@@ -117,7 +117,7 @@ process GetQCThresholds {
   file scripts_folder
 
   output:
-  file("qc_thresholds.yaml") into qc_thresholds_result
+  file("qc_thresholds.yaml") optional true into qc_thresholds_result
 
   script:
   if (params.checkqc_config.length() > 0){
@@ -167,7 +167,7 @@ process MultiQCPerFlowcell {
     file (fastqc:'FastQC/*') from fastqc_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (fastqscreen:'FastQScreen/*') from fastq_screen_results_for_flowcell.map{ it.get(1) }.collect().ifEmpty([])
     file (interop_summary:'Interop_summary/*') from interop_summary_results.collect().ifEmpty([])
-    file qc_thresholds from qc_thresholds_result
+    file qc_thresholds from qc_thresholds_result.collect().ifEmpty("")
     file sequencing_metadata from sequencing_metadata_yaml
     val runfolder_name
     file unaligned
@@ -178,13 +178,16 @@ process MultiQCPerFlowcell {
     file "*multiqc_report.html" into multiqc_report_per_flowcell
     file "*_data.zip"
 
+    script:
+    qc_thresholds_section = qc_thresholds.name == "qc_thresholds.yaml" ? "-c ${qc_thresholds}" : ""
+
     """
     multiqc \
         --title "Flowcell report for $runfolder_name" \
         --ignore '*/Data/Intensities/BaseCalls/L00*' \
         --filename $runfolder_name"_multiqc_report" -z \
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \
-        -c $config_dir/multiqc_flowcell_config.yaml -c $qc_thresholds \
+        -c $config_dir/multiqc_flowcell_config.yaml $qc_thresholds_section \
         .
     """
 
