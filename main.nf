@@ -254,6 +254,7 @@ process multiqc_per_flowcell {
     tuple path("*multiqc_report.html"), path("*_data.zip")
 
     script:
+    threshold_parameter = qc_thresholds ? "-c ${qc_thresholds}" : ""
     """
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
@@ -261,7 +262,7 @@ process multiqc_per_flowcell {
         --filename \${RUNFOLDER}_multiqc_report.html -z \\
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \\
         -c ${params.config_dir}/multiqc_flowcell_config.yaml --disable_clarity \\
-        -c ${qc_thresholds} \\
+        ${threshold_parameter} \\
         .
     """
 
