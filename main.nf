@@ -40,15 +40,14 @@ def helpMessage() {
         nextflow run -profile snpseq main.nf \\
             --run_folder '/path/to/runfolder' \\
             --fastqscreen_databases '/path/to/databases' \\
-            --checkqc_config '/path/to/checkqc.config' \\
-            --bcl2fastq_outdir 'Unaligned'
+            --checkqc_config '/path/to/checkqc.config'
 
     Mandatory parameters:
         --run_folder                        The folder to quality check
 
     Optional parameters:
         --result_dir                        Path to write results (default: results)
-        --bcl2fastq_outdir                  Foldername to check for fastq.gz files (default: Unaligned)
+        --bcl2fastq_outdir                  Foldername to check for fastq.gz files and demultiplexing stats (default: Unaligned)
         --checkqc_config
         --assets_dir
         --config_dir
@@ -181,7 +180,7 @@ process fastq_screen {
         fastq_screen --get_genomes
     elif [ "${params.fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
         sed -i 's/${fastqscreen_default_databases}/${params.fastqscreen_databases}/' fastq_screen.conf
-    fi 
+    fi
     fastq_screen --conf fastq_screen.conf $fastq_file
     """
 }
@@ -292,4 +291,3 @@ process multiqc_per_project {
     """
 
 }
-
