@@ -283,7 +283,7 @@ process multiqc_per_project {
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
         --title "Report for project ${project} on runfolder \${RUNFOLDER}" \\
-        --filename ${project}_\${RUNFOLDER}_multiqc_report.html -z \\
+        --filename \${RUNFOLDER}_${project}_multiqc_report.html -z \\
         -m fastqc -m fastq_screen -m custom_content \\
         --clarity_project ${project} \\
         -o ${project} \\
