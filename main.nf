@@ -104,7 +104,7 @@ def get_project_and_reads(run_folder) {
 
 def combine_results_by_project (fastqc_results,fastq_screen_results) {
 
-    fastqc_results.mix(fastq_screen_results).groupTuple().map { it -> tuple(it[0],it[1][0],it[1][1]) }
+    fastqc_results.mix(fastq_screen_results).groupTuple().map { it -> tuple(it[0],it[1][0].flatten(),it[1][1].flatten()) }
 
 }
 
@@ -128,8 +128,8 @@ workflow check_run_quality {
         get_QC_thresholds(run_folder)
         get_metadata(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
-        fastqc(project_and_reads) | view
-        fastq_screen(project_and_reads) | view
+        fastqc(project_and_reads)
+        fastq_screen(project_and_reads)
         multiqc_per_flowcell( params.run_folder,
             fastqc.out.map{ it[1] }.collect().ifEmpty([]),
             fastq_screen.out.map{ it[1] }.collect().ifEmpty([]),
