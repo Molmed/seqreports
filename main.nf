@@ -132,7 +132,7 @@ workflow check_run_quality {
         fastq_screen(project_and_reads)
         multiqc_per_flowcell( params.run_folder,
             fastqc.out.map{ it[1] }.collect().ifEmpty([]),
-            fastq_screen.out.map{ it[1] }.collect().ifEmpty([]),
+            fastq_screen.out.map{ it[1].flatten() }.collect().ifEmpty([]),
             interop_summary.out.map{ it[1] }.collect().ifEmpty([]),
             get_QC_thresholds.out.collect(),
             get_metadata.out.collect())
@@ -245,7 +245,7 @@ process multiqc_per_flowcell {
     input:
     val runfolder_name
     path ('FastQC/*')
-    path ('FastQScreen/*')
+    path ('FastqScreen/*')
     path ('Interop_summary/*')
     path qc_thresholds
     path sequencing_metadata
