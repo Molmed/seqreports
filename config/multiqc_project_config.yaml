@@ -10,33 +10,6 @@ custom_logo: 'assets/UU_logo_tranp4f125px.png'
 custom_logo_url: 'http://sequencing.se'
 custom_logo_title: 'SNP&SEQ Technology Platform'
 
-clarity:
-    name_edit_regex: '^.*.\/(.*)_L00\d_[R|I]\d_001\.fastq\.gz$'
-
-    report_header_info:
-        Project:
-            'Kit for library preparation':
-            'Project name (from NGI-portal)':
-
-    # TODO The sample level stats is something that we will need tp specify later.
-    general_stats:
-        Sample:
-          'Fake Value':
-#            'Read Length':
-#                description: 'Sequencing read length'
-#            'Insert size (bp)':
-#                description: 'Target insert size'
-#
-    # TODO This does not actually work since the Clarity MultiQC module only works with
-    #      MultiQC v1.0, and we are using v1.7
-    clarity_module:
-        Sample:
-          'Fake Value':
-#            'Read Length':
-#                description: 'Sequencing read length'
-#            'Insert size (bp)':
-#                description: 'Target insert size'
-
 table_columns_visible:
     FastQC:
         percent_duplicates: False
