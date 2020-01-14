@@ -72,8 +72,8 @@ workflow {
     get_run_folder(params.run_folder) | check_run_quality
 
     publish:
-    check_run_quality.out.projectqc            to: "${params.result_dir}/multiqc_by_flowcell"
-    check_run_quality.out.flowcellqc           to: "${params.result_dir}/multiqc_by_project"
+    check_run_quality.out.projectqc            to: "${params.result_dir}/multiqc_by_project"
+    check_run_quality.out.flowcellqc           to: "${params.result_dir}/multiqc_by_flowcell"
 
 }
 
