@@ -8,7 +8,7 @@ You need to:
   - Have a `.genologicsrc` file configured for the Clarity LIMS db you want to use.
 
 Optional:
-  - Download the fastqc-screen database by downloading fastq-screen from [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz), extract the archive and then run `fastq_screen --get_genomes`.
+  - (currently mandatory: see known issues) Download the fastq-screen database by downloading fastq-screen from [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz), extract the archive and then run `fastq_screen --get_genomes`.
 
 ## How to run the nextflow pipeline
 Awesome, you're all set! Let's try generating reports for your favourite runfolder:
