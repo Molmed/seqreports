@@ -50,4 +50,8 @@ workDir = '/path/to/temporary/storage/space'
 
 There are two primary branches of this project:
 - `master`: The stable release branch
-- `dev`: The development and test branch, to which pull requests should be made. 
+- `dev`: The development and test branch, to which pull requests should be made.
+
+### Known issues:
+
+- Unable to download genome indicies using `fastq_screen --get_genomes` as wget within the container does not resolve the address correctly. Fastq Screen must be installed separately (e.g. with conda) and the genomes downloaded prior to running the workflow. The path to the databases must then be given using the `params.fastqscreen_databases` parameter.
