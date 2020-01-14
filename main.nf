@@ -47,11 +47,11 @@ def helpMessage() {
 
     Optional parameters:
         --result_dir                        Path to write results (default: results)
-        --bcl2fastq_outdir                  Foldername to check for fastq.gz files and demultiplexing stats (default: Unaligned)
-        --checkqc_config
-        --assets_dir
-        --config_dir
-        --script_dir
+        --bcl2fastq_outdir                  Folder name to check for fastq.gz files and demultiplexing stats (default: Unaligned)
+        --checkqc_config                    Configuration file for CheckQC
+        --assets_dir                        Location of project assests (default: "\$baseDir/assets").
+        --config_dir                        Location of project configuration files (default: "\$baseDir/config").
+        --script_dir                        Location of project scripts (default: "\$baseDir/bin")
 
         --help                              Print this help message.
 
