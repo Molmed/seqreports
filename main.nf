@@ -128,8 +128,8 @@ workflow check_run_quality {
         get_QC_thresholds(run_folder)
         get_metadata(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
-        fastqc(project_and_reads)
-        fastq_screen(project_and_reads)
+        fastqc(project_and_reads) | view
+        fastq_screen(project_and_reads) | view
         multiqc_per_flowcell( params.run_folder,
             fastqc.out.map{ it[1] }.collect().ifEmpty([]),
             fastq_screen.out.map{ it[1] }.collect().ifEmpty([]),
