@@ -261,7 +261,7 @@ process multiqc_per_flowcell {
         --title "Flowcell report for \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_multiqc_report.html -z \\
         -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \\
-        -c ${params.config_dir}/multiqc_flowcell_config.yaml --disable_clarity \\
+        -c ${params.config_dir}/multiqc_flowcell_config.yaml \\
         ${threshold_parameter} \\
         .
     """
@@ -285,7 +285,6 @@ process multiqc_per_project {
         --title "Report for project ${project} on runfolder \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_${project}_multiqc_report.html -z \\
         -m fastqc -m fastq_screen -m custom_content \\
-        --clarity_project ${project} \\
         -o ${project} \\
         -c ${params.config_dir}/multiqc_project_config.yaml \\
         .
