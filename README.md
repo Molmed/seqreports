@@ -35,12 +35,19 @@ Additional profiles:
 
 ### Supplying a custom config file
 
-Custom config files can contain all command line parameters and anything else that needs to be overridden.
+Custom config files can contain all command line parameters, nextflow parameters, and overriding options.
 
+For example:
 ```
 resume = true
 params.run_folder = '/path/to/runfolder'
 params.fastqscreen_databases = '/path/to/databases'
 params.checkqc_config = '/path/to/checkqc.config'
-workDir = /path/to/temporary/storage/space
+workDir = '/path/to/temporary/storage/space'
 ```
+
+## Development
+
+There are two primary branches of this project:
+- `master`: The stable release branch
+- `dev`: The development and test branch, to which pull requests should be made. 
