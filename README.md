@@ -14,10 +14,10 @@ Optional:
 Awesome, you're all set! Let's try generating reports for your favourite runfolder:
 ```bash
         # Using parameters supplied in a config (see below)
-        nextflow run -c custom.config -profile snpseq main.nf
+        nextflow run -c custom.config -profile snpseq,singularity main.nf
 
         # Using parameters supplied on the command line
-        nextflow run -profile snpseq main.nf \
+        nextflow run -profile snpseq,singularity main.nf \
             --run_folder '/path/to/runfolder' \
             --fastqscreen_databases '/path/to/databases' \
             --checkqc_config '/path/to/checkqc.config'
@@ -25,12 +25,13 @@ Awesome, you're all set! Let's try generating reports for your favourite runfold
 
 ### Available profiles
 
-There are two primary config profiles:
-- `snpseq`: For running locally.
-- `irma`: For running on uppmax cluster irma with slurm (note: The parameter `params.project` must be supplied).
+These are the primary config profiles:
+- `dev`:          Run locally with low memory.
+- `irma`:         Uppmax slurm profile for use on the cluster `irma` (note: The parameter `params.project` must be supplied).
+- `snpseq`:       Run locally with greater memory available than `dev`.
+- `singularity`:  Enables singularity and provides container URLs.
 
 Additional profiles:
-- `dev`: supplies less memory.
 - `debug`: prints out the `env` properties before executing processes.
 
 ### Supplying a custom config file
