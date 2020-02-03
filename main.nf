@@ -116,7 +116,7 @@ workflow check_run_quality {
         |     -> GetQCThresholds                        -> MultiQCPerFlowcell
         |     -> GetMetaData                            -> MultiQCPerFlowcell + MultiQCPerProject
         |
-        \ -> "Undeterminded/<Project>" -> FastQC        -> MultiQCPerFlowcell + MultiQCPerProject
+        \ -> "[Undetermined|<Project>]" -> FastQC       -> MultiQCPerFlowcell + MultiQCPerProject
                                        -> FastqScreen   -> MultiQCPerFlowcell + MultiQCPerProject
     */
 
