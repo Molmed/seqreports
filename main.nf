@@ -203,7 +203,6 @@ process get_QC_thresholds {
     python ${params.script_dir}/get_qc_config.py --runfolder $runfolder \\
         $checkqc_config_section
     """
-
 }
 
 process get_metadata {
