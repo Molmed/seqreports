@@ -131,9 +131,9 @@ workflow check_run_quality {
         fastqc(project_and_reads)
         fastq_screen(project_and_reads)
         multiqc_per_flowcell( params.run_folder,
-            fastqc.out.map{ it[1] }.collect().ifEmpty([]),
-            fastq_screen.out.map{ it[1] }.collect().ifEmpty([]),
-            interop_summary.out.map{ it[1] }.collect().ifEmpty([]),
+            fastqc.out.map{ it[1] }.collect(),
+            fastq_screen.out.map{ it[1] }.collect(),
+            interop_summary.out.map{ it[1] }.collect(),
             get_QC_thresholds.out.collect(),
             get_metadata.out.collect())
         multiqc_per_project( params.run_folder,
