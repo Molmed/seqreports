@@ -97,7 +97,7 @@ def get_project_and_reads(run_folder) {
         .map {
             it.toString().indexOf('Undetermined') > 0 ?
                 ['NoProject', it] :
-                [(it.toString() =~ /^.*\/Unaligned\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
+                [(it.toString() =~ /^.*\/${params.bcl2fastq_outdir}\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
         }
 
 }
