@@ -5,7 +5,6 @@ This is a Nextflow pipeline for generating sequencing reports for the SNP&amp;Se
 You need to:
   - install Nextflow (e.g. using conda `conda create -n nextflow-env nextflow` or downloading from [nextflow.io](https://www.nextflow.io/)).
   - install [Singularity (version > 2.6)](https://singularity.lbl.gov/install-linux#adding-the-mirror-and-installing).
-  - Have a `.genologicsrc` file configured for the Clarity LIMS db you want to use.
 
 Optional:
   - (currently mandatory: see known issues) Download the fastq-screen database by downloading fastq-screen from [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz), extract the archive and then run `fastq_screen --get_genomes`.
