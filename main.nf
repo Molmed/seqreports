@@ -134,7 +134,7 @@ workflow check_run_quality {
             fastqc.out.map{ it[1] }.collect(),
             fastq_screen.out.map{ it[1] }.collect(),
             interop_summary.out.map{ it[1] }.collect(),
-            get_QC_thresholds.out.collect(),
+            get_QC_thresholds.out.collect().ifEmpty([]),
             get_metadata.out.collect())
         multiqc_per_project( params.run_folder,
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
@@ -253,7 +253,7 @@ process multiqc_per_flowcell {
     tuple path("*multiqc_report.html"), path("*_data.zip")
 
     script:
-    threshold_parameter = qc_thresholds ? "-c ${qc_thresholds}" : ""
+    threshold_parameter = qc_thresholds.isEmpty() ? "": "-c ${qc_thresholds}"
     """
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
