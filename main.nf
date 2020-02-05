@@ -282,7 +282,6 @@ process multiqc_per_project {
     multiqc \\
         --title "Report for project ${project} on runfolder \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_${project}_multiqc_report.html -z \\
-        -m fastqc -m fastq_screen -m custom_content \\
         -o ${project} \\
         -c ${params.config_dir}/multiqc_project_config.yaml \\
         .
