@@ -249,6 +249,7 @@ process multiqc_per_flowcell {
     path ('Interop_summary/*')
     path qc_thresholds
     path sequencing_metadata
+    path bcl2fastq_stats
 
     output:
     tuple path("*multiqc_report.html"), path("*_data.zip")
