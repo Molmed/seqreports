@@ -244,14 +244,14 @@ process interop_summary {
 process multiqc_per_flowcell {
 
     input:
-    val runfolder_name
-    path ('FastQC/*')
-    path ('FastqScreen/*')
-    path ('Interop_summary/*')
-    path qc_thresholds
-    path sequencing_metadata
-    path bcl2fastq_stats
-    path assets
+    val runfolder_name              // Run folder name
+    path ('FastQC/*')               // Fastqc logs
+    path ('FastqScreen/*')          // Fastq screen logs
+    path ('Interop_summary/*')      // Interop log
+    path qc_thresholds              // Quality check thresholds (optional)
+    path sequencing_metadata        // Sequencing meta data ( custom content data )
+    path bcl2fastq_stats            // Bcl2Fastq logs
+    path assets                     // Staged copy of assets folder
 
     output:
     tuple path("*multiqc_report.html"), path("*_data.zip")
