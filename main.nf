@@ -140,7 +140,8 @@ workflow check_run_quality {
             params.assets_dir)
         multiqc_per_project( params.run_folder,
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
-            get_metadata.out.collect())
+            get_metadata.out.collect(),
+            params.assets_dir)
 
     emit:
         flowcellqc = multiqc_per_flowcell.out
@@ -276,6 +277,7 @@ process multiqc_per_project {
     val runfolder_name
     tuple project, path("FastQC/*"), path("FastqScreen/*")
     path sequencing_metadata
+    path assets                     // Staged copy of assets folder
 
     output:
     tuple path("${project}/*multiqc_report.html"), path("${project}/*_data.zip")
