@@ -30,3 +30,6 @@ top_modules:
 
 remove_sections:
     - 'fastqc_sequence_counts'
+
+interop/summary:
+    fn: '*summary_interop'
