@@ -259,7 +259,6 @@ process multiqc_per_flowcell {
     multiqc \\
         --title "Flowcell report for \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_multiqc_report.html -z \\
-        -m fastqc -m fastq_screen -m bcl2fastq -m interop -m custom_content \\
         -c ${params.config_dir}/multiqc_flowcell_config.yaml \\
         ${threshold_parameter} \\
         .
