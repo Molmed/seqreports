@@ -133,7 +133,7 @@ workflow check_run_quality {
         multiqc_per_flowcell( params.run_folder,
             fastqc.out.map{ it[1] }.collect(),
             fastq_screen.out.map{ it[1] }.collect(),
-            interop_summary.out.map{ it[1] }.collect(),
+            interop_summary.out.collect(),
             get_QC_thresholds.out.collect().ifEmpty([]),
             get_metadata.out.collect(),
             Channel.fromPath("${run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect(),
