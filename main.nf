@@ -132,7 +132,7 @@ workflow check_run_quality {
             interop_summary.out.collect(),
             get_QC_thresholds.out.collect().ifEmpty([]),
             get_metadata.out.collect(),
-            Channel.fromPath("${run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect(),
+            Channel.fromPath("${params.run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect().ifEmpty([]),
             params.assets_dir)
         multiqc_per_project( params.run_folder,
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
