@@ -72,8 +72,8 @@ workflow {
     get_run_folder(params.run_folder) | check_run_quality
 
     publish:
-    check_run_quality.out.projectqc            to: "${params.result_dir}/multiqc_by_project"
-    check_run_quality.out.flowcellqc           to: "${params.result_dir}/multiqc_by_flowcell"
+    check_run_quality.out.projectqc            to: "${params.result_dir}/multiqc_by_project", mode: 'copy'
+    check_run_quality.out.flowcellqc           to: "${params.result_dir}/multiqc_by_flowcell", mode: 'copy'
 
 }
 
@@ -136,7 +136,7 @@ workflow check_run_quality {
             interop_summary.out.map{ it[1] }.collect(),
             get_QC_thresholds.out.collect().ifEmpty([]),
             get_metadata.out.collect(),
-            file("${run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json"),
+            Channel.fromPath("${run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect(),
             params.assets_dir)
         multiqc_per_project( params.run_folder,
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
@@ -258,7 +258,7 @@ process multiqc_per_flowcell {
     tuple path("*multiqc_report.html"), path("*_data.zip")
 
     script:
-    threshold_parameter = qc_thresholds.isEmpty() ? "": "-c ${qc_thresholds}"
+    threshold_parameter = qc_thresholds ? "": "-c ${qc_thresholds}"
     """
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
