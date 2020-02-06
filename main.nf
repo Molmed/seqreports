@@ -8,7 +8,7 @@ nextflow.preview.dsl=2
    #################################################### */
 
 // Pipeline parameters
-params.run_folder = ""
+params.run_folder = "/path/to/run_folder"
 params.result_dir = "results"
 fastqscreen_default_databases = "FastQ_Screen_Genomes"
 params.fastqscreen_databases = fastqscreen_default_databases
@@ -69,7 +69,10 @@ if (params.help || !params.run_folder){
 workflow {
 
     main:
-    get_run_folder(params.run_folder) | check_run_quality
+    Channel.fromPath(params.run_folder,checkIfExists:true)
+        .ifEmpty { "Error: No run folder (--run_folder) given."; exit 1 }
+        .set {run_folder}
+    check_run_quality(run_folder)
 
     publish:
     check_run_quality.out.projectqc            to: "${params.result_dir}/multiqc_by_project", mode: 'copy'
@@ -81,17 +84,10 @@ workflow.onComplete {
 	log.info ( workflow.success ? "\nDone! Open the reports in your browser.\n" : "Oops .. something went wrong." )
 }
 
-def get_run_folder(run_folder) {
-
-    Channel.value(file(run_folder))
-        .ifEmpty { "Error: No run folder (--run_folder) given."; exit 1 }
-
-}
-
 def get_project_and_reads(run_folder) {
 
     Channel
-        .fromPath("${run_folder}/${params.bcl2fastq_outdir}/**.fastq.gz", maxDepth: 10 )
+        .fromPath("${run_folder}/${params.bcl2fastq_outdir}/**.fastq.gz" )
         .filter( ~/.*_[^I]\d_001\.fastq\.gz$/ )
         .ifEmpty { "Error: No fastq files found under ${run_folder}/ !\n"; exit 1 }
         .map {
