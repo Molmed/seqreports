@@ -1,40 +1,57 @@
-# summary-report-development
-This is a nextflow pipeline for generating sequencing reports for the SNP&amp;Seq Technology platform, NGI Uppsala, SciLifelab Genomics.
+# SNP&amp;Seq summary report pipeline
+This is a Nextflow pipeline for generating sequencing reports for the SNP&amp;Seq Technology platform, NGI Uppsala, SciLifelab Genomics.
 
-# Pre-requisites
+## Pre-requisites
 You need to:
-  - install Nextflow
-  - install [Singularity (version > 2.6)](https://singularity.lbl.gov/install-linux#adding-the-mirror-and-installing)
-  - Have a `.genologicsrc` file configured for the Clarity LIMS db you want to use
+  - install Nextflow (e.g. using conda `conda create -n nextflow-env nextflow` or downloading from [nextflow.io](https://www.nextflow.io/)).
+  - install [Singularity (version > 2.6)](https://singularity.lbl.gov/install-linux#adding-the-mirror-and-installing).
 
+Optional:
+  - (currently mandatory: see known issues) Download the fastq-screen database by downloading fastq-screen from [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz), extract the archive and then run `fastq_screen --get_genomes`.
 
-# Downloading fastqc-screen database
-Ideally we want to do this automatically, tough right now there are problems with internet-access from the
-fastq-screen containers, so this is a temporary workaround for that. Here's how you do it:
-
- - Download fastqc-screen from  [here](https://www.bioinformatics.babraham.ac.uk/projects/fastq_screen/fastq_screen_v0.13.0.tar.gz).
- - Uncompress it
- - Run `fastq_screen --get_genomes`
-
-
-# How to run the nextflow pipeline
+## How to run the nextflow pipeline
 Awesome, you're all set! Let's try generating reports for your favourite runfolder:
-```
-nextflow -c config/nextflow.config run main.nf \
-          --runfolder ~/large_disk/180126_HSX122_0568_BHLFWLBBXX_small/ \
-          --fastq_screen_db ~/large_disk/FastQ_Screen_Genomes/
+```bash
+        # Using parameters supplied in a config (see below)
+        nextflow run -c custom.config -profile snpseq,singularity main.nf
+
+        # Using parameters supplied on the command line
+        nextflow run -profile snpseq,singularity main.nf \
+            --run_folder '/path/to/runfolder' \
+            --fastqscreen_databases '/path/to/databases' \
+            --checkqc_config '/path/to/checkqc.config'
 ```
 
-## Profiles
-There are three different config profiles:
-- `standard`: For running locally
-- `dev`: Like standard but with less memory
-- `irma`: For running on uppmax cluster irma with slurm
+### Available profiles
 
-Usage:
+These are the primary config profiles:
+- `dev`:          Run locally with low memory.
+- `irma`:         Uppmax slurm profile for use on the cluster `irma` (note: The parameter `params.project` must be supplied).
+- `snpseq`:       Run locally with greater memory available than `dev`.
+- `singularity`:  Enables singularity and provides container URLs.
+
+Additional profiles:
+- `debug`: prints out the `env` properties before executing processes.
+
+### Supplying a custom config file
+
+Custom config files can contain all command line parameters, nextflow parameters, and overriding options.
+
+For example:
 ```
-nextflow run main.nf -profile dev <rest of the options>
+resume = true
+params.run_folder = '/path/to/runfolder'
+params.fastqscreen_databases = '/path/to/databases'
+params.checkqc_config = '/path/to/checkqc.config'
+workDir = '/path/to/temporary/storage/space'
 ```
 
-### irma profile
-When using the irma profile, use the `--project` parameter to specify which project should be accounted for the running time
+## Development
+
+There are two primary branches of this project:
+- `master`: The stable release branch
+- `dev`: The development and test branch, to which pull requests should be made.
+
+### Known issues:
+
+- Unable to download genome indicies using `fastq_screen --get_genomes` as wget within the container does not resolve the address correctly. Fastq Screen must be installed separately (e.g. with conda) and the genomes downloaded prior to running the workflow. The path to the databases must then be given using the `params.fastqscreen_databases` parameter.
