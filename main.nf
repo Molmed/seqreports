@@ -116,7 +116,7 @@ workflow check_run_quality {
                                        -> FastqScreen   -> MultiQCPerFlowcell + MultiQCPerProject
     */
 
-    get:
+    take:
         run_folder
 
     main:
