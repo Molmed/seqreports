@@ -254,7 +254,7 @@ process multiqc_per_flowcell {
     tuple path("*multiqc_report.html"), path("*_data.zip")
 
     script:
-    threshold_parameter = qc_thresholds ? "": "-c ${qc_thresholds}"
+    threshold_parameter = qc_thresholds ? "-c ${qc_thresholds}" : ""
     """
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
