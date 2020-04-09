@@ -125,7 +125,7 @@ workflow check_run_quality {
         get_metadata(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
         fastqc(project_and_reads)
-        fastq_screen(project_and_reads)
+        fastq_screen(project_and_reads, params.config_dir)
         multiqc_per_flowcell( params.run_folder,
             fastqc.out.map{ it[1] }.collect(),
             fastq_screen.out.map{ it[1] }.collect(),
@@ -133,11 +133,13 @@ workflow check_run_quality {
             get_QC_thresholds.out.collect().ifEmpty([]),
             get_metadata.out.collect(),
             Channel.fromPath("${params.run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect().ifEmpty([]),
-            params.assets_dir)
+            params.assets_dir,
+            params.config_dir)
         multiqc_per_project( params.run_folder,
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
             get_metadata.out.collect(),
-            params.assets_dir)
+            params.assets_dir,
+            params.config_dir)
 
     emit:
         flowcellqc = multiqc_per_flowcell.out
@@ -167,6 +169,7 @@ process fastq_screen {
 
     input:
     tuple project, path(fastq_file)
+    path config_dir
 
     output:
     tuple project, path("*_screen.{txt,html}")
@@ -174,7 +177,7 @@ process fastq_screen {
     script:
     """
     sed -E 's/^(THREADS[[:blank:]]+)[[:digit:]]+/\1${task.cpus}/' \\
-        ${params.config_dir}/fastq_screen.conf > fastq_screen.conf
+        ${config_dir}/fastq_screen.conf > fastq_screen.conf
     if [ ! -e "${params.fastqscreen_databases}" ]; then
         fastq_screen --get_genomes
     elif [ "${params.fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
@@ -249,6 +252,7 @@ process multiqc_per_flowcell {
     path sequencing_metadata        // Sequencing meta data ( custom content data )
     path bcl2fastq_stats            // Bcl2Fastq logs
     path assets                     // Staged copy of assets folder
+    path config_dir    
 
     output:
     tuple path("*multiqc_report.html"), path("*_data.zip")
@@ -260,7 +264,7 @@ process multiqc_per_flowcell {
     multiqc \\
         --title "Flowcell report for \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_multiqc_report.html -z \\
-        -c ${params.config_dir}/multiqc_flowcell_config.yaml \\
+        -c ${config_dir}/multiqc_flowcell_config.yaml \\
         ${threshold_parameter} \\
         .
     """
@@ -274,6 +278,7 @@ process multiqc_per_project {
     tuple project, path("FastQC/*"), path("FastqScreen/*")
     path sequencing_metadata
     path assets                     // Staged copy of assets folder
+    path config_dir
 
     output:
     tuple path("${project}/*multiqc_report.html"), path("${project}/*_data.zip")
@@ -285,7 +290,7 @@ process multiqc_per_project {
         --title "Report for project ${project} on runfolder \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_${project}_multiqc_report.html -z \\
         -o ${project} \\
-        -c ${params.config_dir}/multiqc_project_config.yaml \\
+        -c ${config_dir}/multiqc_project_config.yaml \\
         .
     """
 
