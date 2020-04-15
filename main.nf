@@ -125,7 +125,9 @@ workflow check_run_quality {
         get_metadata(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
         fastqc(project_and_reads)
-        fastq_screen(project_and_reads, params.config_dir)
+        fastq_screen(project_and_reads,
+		     params.config_dir,
+		     params.fastqscreen_databases)
         multiqc_per_flowcell( params.run_folder,
             fastqc.out.map{ it[1] }.collect(),
             fastq_screen.out.map{ it[1] }.collect(),
@@ -170,6 +172,7 @@ process fastq_screen {
     input:
     tuple project, path(fastq_file)
     path config_dir
+    path fastqscreen_databases
 
     output:
     tuple project, path("*_screen.{txt,html}")
@@ -178,10 +181,10 @@ process fastq_screen {
     """
     sed -E 's/^(THREADS[[:blank:]]+)[[:digit:]]+/\1${task.cpus}/' \\
         ${config_dir}/fastq_screen.conf > fastq_screen.conf
-    if [ ! -e "${params.fastqscreen_databases}" ]; then
+    if [ ! -e "${fastqscreen_databases}" ]; then
         fastq_screen --get_genomes
-    elif [ "${params.fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
-        sed -i 's#${fastqscreen_default_databases}#${params.fastqscreen_databases}#' fastq_screen.conf
+    elif [ "${fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
+        sed -i 's#${fastqscreen_default_databases}#${fastqscreen_databases}#' fastq_screen.conf
     fi
     fastq_screen --conf fastq_screen.conf $fastq_file
     """
