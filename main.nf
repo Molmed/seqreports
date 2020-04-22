@@ -75,8 +75,8 @@ workflow {
     check_run_quality(run_folder)
 
     publish:
-    check_run_quality.out.projectqc            to: "${params.result_dir}/projects", mode: 'copy'
-    check_run_quality.out.flowcellqc           to: "${params.result_dir}/flowcell_report", mode: 'copy'
+    check_run_quality.out.projectqc            to: "${params.result_dir}/projects", mode: 'copy', overwrite: true
+    check_run_quality.out.flowcellqc           to: "${params.result_dir}/flowcell_report", mode: 'copy', overwrite: true
 
 }
 
