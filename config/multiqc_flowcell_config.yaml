@@ -10,6 +10,8 @@ custom_logo: 'assets/UU_logo_tranp4f125px.png'
 custom_logo_url: 'http://sequencing.se'
 custom_logo_title: 'SNP&SEQ Technology Platform'
 
+plots_force_interactive: True
+
 run_modules:
     - fastqc
     - fastq_screen
