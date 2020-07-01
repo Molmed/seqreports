@@ -267,6 +267,7 @@ process multiqc_per_flowcell {
     multiqc \\
         --title "Flowcell report for \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_multiqc_report.html -z \\
+        -c ${config_dir}/multiqc_main_config.yaml \\
         -c ${config_dir}/multiqc_flowcell_config.yaml \\
         ${threshold_parameter} \\
         .
@@ -293,6 +294,7 @@ process multiqc_per_project {
         --title "Report for project ${project} on runfolder \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_${project}_multiqc_report.html -z \\
         -o ${project} \\
+        -c ${config_dir}/multiqc_main_config.yaml \\
         -c ${config_dir}/multiqc_project_config.yaml \\
         .
     """
