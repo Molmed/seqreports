@@ -1,17 +1,5 @@
 # Config for project reports
 
-subtitle: "NGI Uppsala - SNP&SEQ Technology Platform"
-intro_text: |
-  This is a report containing quality control information about your project run at the SNP&SEQ Technology
-  Platform. If you have any questions, please do not hesitate to contact us at
-  <a href="mailto:seq@medsci.uu.se">seq@medsci.uu.se</a>
-
-custom_logo: 'assets/UU_logo_tranp4f125px.png'
-custom_logo_url: 'http://sequencing.se'
-custom_logo_title: 'SNP&SEQ Technology Platform'
-
-plots_force_interactive: True 
-
 run_modules:
     - fastqc
     - fastq_screen
@@ -24,5 +12,3 @@ table_columns_visible:
 top_modules:
     - 'custom_content'
 
-remove_sections:
-    - 'fastqc_sequence_counts'
