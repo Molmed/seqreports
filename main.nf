@@ -3,7 +3,7 @@
 nextflow.preview.dsl=2
 /* ####################################################
 
-   SNP & SEQ Run folder QC pipeline
+   seqreports: SNP & SEQ Run folder QC pipeline
 
    #################################################### */
 
@@ -23,7 +23,7 @@ def helpMessage() {
 
     log.info """
 
-    SNP & SEQ Run folder QC pipeline.
+    seqreports: SNP & SEQ Run folder QC pipeline.
 
     This workflow runs the following tools on a run folder:
         * InterOp summary    (http://illumina.github.io/interop/example_summary.html)
@@ -60,6 +60,14 @@ def helpMessage() {
 
     """
 }
+
+def printVersion() {
+
+    log.info "seqreports v${workflow.manifest.version}"
+
+}
+
+printVersion()
 
 if (params.help || !params.run_folder){
     helpMessage()

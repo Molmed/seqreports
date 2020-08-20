@@ -1,4 +1,4 @@
-# SNP&amp;Seq summary report pipeline
+# seqreports: SNP&amp;Seq Run folder QC pipeline
 This is a Nextflow pipeline for generating sequencing reports for the SNP&amp;Seq Technology platform, NGI Uppsala, SciLifelab Genomics.
 
 ## Pre-requisites
