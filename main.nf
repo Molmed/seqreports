@@ -159,11 +159,12 @@ process fastqc {
     tuple project, path(fastq_file)
 
     output:
-    tuple project, path("*_fastqc.{zip,html}")
+    tuple project, path("*_results")
 
     script:
     """
-    fastqc -t ${task.cpus} $fastq_file
+    mkdir -p $fastq_file"_fastqc_results"
+    fastqc -t ${task.cpus} -o $fastq_file"_fastqc_results" $fastq_file
     """
 }
 
@@ -175,7 +176,7 @@ process fastq_screen {
     path fastqscreen_databases
 
     output:
-    tuple project, path("*_screen.{txt,html}")
+    tuple project, path("*_results")
 
     script:
     """
@@ -186,7 +187,8 @@ process fastq_screen {
     elif [ "${fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
         sed -i 's#${fastqscreen_default_databases}#${fastqscreen_databases}#' fastq_screen.conf
     fi
-    fastq_screen --conf fastq_screen.conf $fastq_file
+    mkdir -p $fastq_file"_fastq_screen_results"
+    fastq_screen --conf fastq_screen.conf --outdir $fastq_file"_fastq_screen_results" $fastq_file
     """
 }
 
