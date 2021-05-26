@@ -255,6 +255,7 @@ process interop_summary {
 }
 
 process multiqc_per_flowcell {
+    label 'high_memory'
 
     input:
     val runfolder_name              // Run folder name
@@ -286,6 +287,7 @@ process multiqc_per_flowcell {
 }
 
 process multiqc_per_project {
+    label 'high_memory'
 
     input:
     val runfolder_name
