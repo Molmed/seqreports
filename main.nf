@@ -82,10 +82,6 @@ workflow {
         .set {run_folder}
     CHECK_RUN_QUALITY(run_folder)
 
-    publish:
-    CHECK_RUN_QUALITY.out.projectqc            to: "${params.result_dir}/projects", mode: 'copy', overwrite: true
-    CHECK_RUN_QUALITY.out.flowcellqc           to: "${params.result_dir}/flowcell_report", mode: 'copy', overwrite: true
-
 }
 
 workflow.onComplete {
@@ -150,10 +146,6 @@ workflow CHECK_RUN_QUALITY {
             get_metadata.out.collect(),
             params.assets_dir,
             params.config_dir)
-
-    emit:
-        flowcellqc = MULTIQC_PER_FLOWCELL.out
-        projectqc = MULTIQC_PER_PROJECT.out
 
 }
 
@@ -255,6 +247,8 @@ process INTEROP_SUMMARY {
 }
 
 process MULTIQC_PER_FLOWCELL {
+
+    publishDir "${params.result_dir}/flowcell_report", mode: 'copy', overwrite: true
     label 'high_memory'
 
     input:
@@ -287,6 +281,8 @@ process MULTIQC_PER_FLOWCELL {
 }
 
 process MULTIQC_PER_PROJECT {
+
+    publishDir "${params.result_dir}/projects", mode: 'copy', overwrite: true
     label 'high_memory'
 
     input:
