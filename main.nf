@@ -103,8 +103,13 @@ def get_project_and_reads(run_folder) {
 }
 
 def combine_results_by_project (fastqc_results,fastq_screen_results) {
+    // fastqc_results           // [Project, [fqcfiles1, fqcfiles2, fqcfiles3]]
+    // fastq_screen_results     // [Project, [fqsfiles1, fqsfiles2, fqsfiles3]]
 
-    fastqc_results.mix(fastq_screen_results).groupTuple().map { it -> tuple(it[0],it[1][0].flatten(),it[1][1].flatten()) }
+    fastqc_results.mix(fastq_screen_results)
+        .groupTuple()           // [Project, [[fqcfiles1, fqcfiles2, fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3]] ]
+        .map { it -> tuple(it[0],it[1][0].flatten(),it[1][1].flatten()) }
+                                // [Project, [fqcfiles1,fqcfiles2,fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3]]
 
 }
 
