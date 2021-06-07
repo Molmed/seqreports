@@ -138,17 +138,17 @@ workflow CHECK_RUN_QUALITY {
 		     params.config_dir,
 		     params.fastqscreen_databases)
         MULTIQC_PER_FLOWCELL( params.run_folder,
-            fastqc.out.map{ it[1] }.collect(),
-            fastq_screen.out.map{ it[1] }.collect(),
-            interop_summary.out.collect(),
-            get_QC_thresholds.out.collect().ifEmpty([]),
-            get_metadata.out.collect(),
+            FASTQC.out.map{ it[1] }.collect(),
+            FASTQ_SCREEN.out.map{ it[1] }.collect(),
+            INTEROP_SUMMARY.out.collect(),
+            GET_QC_THRESHOLDS.out.collect().ifEmpty([]),
+            GET_METADATA.out.collect(),
             Channel.fromPath("${params.run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect().ifEmpty([]),
             params.assets_dir,
             params.config_dir)
         MULTIQC_PER_PROJECT( params.run_folder,
-            combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
-            get_metadata.out.collect(),
+            combine_results_by_project(FASTQC.out.groupTuple(),FASTQ_SCREEN.out.groupTuple()),
+            GET_METADATA.out.collect(),
             params.assets_dir,
             params.config_dir)
 
