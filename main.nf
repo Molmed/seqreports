@@ -265,7 +265,7 @@ process MULTIQC_PER_FLOWCELL {
     path sequencing_metadata        // Sequencing meta data ( custom content data )
     path bcl2fastq_stats            // Bcl2Fastq logs
     path assets                     // Staged copy of assets folder
-    path config_dir
+    path config_dir                 // Staged copy of config folder
 
     output:
     tuple path("*multiqc_report.html"), path("*_data.zip")
@@ -295,7 +295,7 @@ process MULTIQC_PER_PROJECT {
     tuple project, path("FastQC/*"), path("FastqScreen/*")
     path sequencing_metadata
     path assets                     // Staged copy of assets folder
-    path config_dir
+    path config_dir                 // Staged copy of config folder
 
     output:
     tuple path("${project}/*multiqc_report.html"), path("${project}/*_data.zip")
