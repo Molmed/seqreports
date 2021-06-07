@@ -80,11 +80,11 @@ workflow {
     Channel.fromPath(params.run_folder,checkIfExists:true)
         .ifEmpty { "Error: No run folder (--run_folder) given."; exit 1 }
         .set {run_folder}
-    check_run_quality(run_folder)
+    CHECK_RUN_QUALITY(run_folder)
 
     publish:
-    check_run_quality.out.projectqc            to: "${params.result_dir}/projects", mode: 'copy', overwrite: true
-    check_run_quality.out.flowcellqc           to: "${params.result_dir}/flowcell_report", mode: 'copy', overwrite: true
+    CHECK_RUN_QUALITY.out.projectqc            to: "${params.result_dir}/projects", mode: 'copy', overwrite: true
+    CHECK_RUN_QUALITY.out.flowcellqc           to: "${params.result_dir}/flowcell_report", mode: 'copy', overwrite: true
 
 }
 
@@ -112,7 +112,7 @@ def combine_results_by_project (fastqc_results,fastq_screen_results) {
 
 }
 
-workflow check_run_quality {
+workflow CHECK_RUN_QUALITY {
 
     /* Workflow Graph
 
@@ -128,15 +128,15 @@ workflow check_run_quality {
         run_folder
 
     main:
-        interop_summary(run_folder)
-        get_QC_thresholds(run_folder)
-        get_metadata(run_folder)
+        INTEROP_SUMMARY(run_folder)
+        GET_QC_THRESHOLDS(run_folder)
+        GET_METADATA(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
-        fastqc(project_and_reads)
-        fastq_screen(project_and_reads,
+        FASTQC(project_and_reads)
+        FASTQ_SCREEN(project_and_reads,
 		     params.config_dir,
 		     params.fastqscreen_databases)
-        multiqc_per_flowcell( params.run_folder,
+        MULTIQC_PER_FLOWCELL( params.run_folder,
             fastqc.out.map{ it[1] }.collect(),
             fastq_screen.out.map{ it[1] }.collect(),
             interop_summary.out.collect(),
@@ -145,15 +145,15 @@ workflow check_run_quality {
             Channel.fromPath("${params.run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect().ifEmpty([]),
             params.assets_dir,
             params.config_dir)
-        multiqc_per_project( params.run_folder,
+        MULTIQC_PER_PROJECT( params.run_folder,
             combine_results_by_project(fastqc.out.groupTuple(),fastq_screen.out.groupTuple()),
             get_metadata.out.collect(),
             params.assets_dir,
             params.config_dir)
 
     emit:
-        flowcellqc = multiqc_per_flowcell.out
-        projectqc = multiqc_per_project.out
+        flowcellqc = MULTIQC_PER_FLOWCELL.out
+        projectqc = MULTIQC_PER_PROJECT.out
 
 }
 
@@ -161,7 +161,7 @@ workflow check_run_quality {
 // Processes
 // ---------------------------------------------------
 
-process fastqc {
+process FASTQC {
 
     input:
     tuple project, path(fastq_file)
@@ -176,7 +176,7 @@ process fastqc {
     """
 }
 
-process fastq_screen {
+process FASTQ_SCREEN {
 
     input:
     tuple project, path(fastq_file)
@@ -200,7 +200,7 @@ process fastq_screen {
     """
 }
 
-process get_QC_thresholds {
+process GET_QC_THRESHOLDS {
 
     input:
     path runfolder
@@ -220,7 +220,7 @@ process get_QC_thresholds {
     """
 }
 
-process get_metadata {
+process GET_METADATA {
 
     input:
     path runfolder
@@ -240,7 +240,7 @@ process get_metadata {
     """
 }
 
-process interop_summary {
+process INTEROP_SUMMARY {
 
     input:
     path runfolder
@@ -254,7 +254,7 @@ process interop_summary {
     """
 }
 
-process multiqc_per_flowcell {
+process MULTIQC_PER_FLOWCELL {
     label 'high_memory'
 
     input:
@@ -286,7 +286,7 @@ process multiqc_per_flowcell {
 
 }
 
-process multiqc_per_project {
+process MULTIQC_PER_PROJECT {
     label 'high_memory'
 
     input:
