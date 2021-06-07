@@ -1,6 +1,6 @@
 #! /usr/bin/env nextflow
 
-nextflow.preview.dsl=2
+nextflow.enable.dsl=2
 /* ####################################################
 
    seqreports: SNP & SEQ Run folder QC pipeline
@@ -266,7 +266,7 @@ process multiqc_per_flowcell {
     path sequencing_metadata        // Sequencing meta data ( custom content data )
     path bcl2fastq_stats            // Bcl2Fastq logs
     path assets                     // Staged copy of assets folder
-    path config_dir    
+    path config_dir
 
     output:
     tuple path("*multiqc_report.html"), path("*_data.zip")
