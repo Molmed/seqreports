@@ -161,10 +161,10 @@ workflow CHECK_RUN_QUALITY {
 process FASTQC {
 
     input:
-    tuple project, path(fastq_file)
+    tuple val(project), path(fastq_file)
 
     output:
-    tuple project, path("*_results")
+    tuple val(project), path("*_results")
 
     script:
     """
@@ -176,12 +176,12 @@ process FASTQC {
 process FASTQ_SCREEN {
 
     input:
-    tuple project, path(fastq_file)
+    tuple val(project), path(fastq_file)
     path config_dir
     path fastqscreen_databases
 
     output:
-    tuple project, path("*_results")
+    tuple val(project), path("*_results")
 
     script:
     """
@@ -292,7 +292,7 @@ process MULTIQC_PER_PROJECT {
 
     input:
     val runfolder_name
-    tuple project, path("FastQC/*"), path("FastqScreen/*")
+    tuple val(project), path("FastQC/*"), path("FastqScreen/*")
     path sequencing_metadata
     path assets                     // Staged copy of assets folder
     path config_dir                 // Staged copy of config folder
