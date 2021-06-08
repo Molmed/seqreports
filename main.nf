@@ -102,14 +102,16 @@ def get_project_and_reads(run_folder) {
 
 }
 
-def combine_results_by_project (fastqc_results,fastq_screen_results) {
+def combine_results_by_project (fastqc_results,fastq_screen_results,rrna_results) {
     // fastqc_results           // [Project, [fqcfiles1, fqcfiles2, fqcfiles3]]
     // fastq_screen_results     // [Project, [fqsfiles1, fqsfiles2, fqsfiles3]]
+    // rrna_results             // [Project, [rrnafiles1, rrnafiles2]]
 
     fastqc_results.mix(fastq_screen_results)
-        .groupTuple()           // [Project, [[fqcfiles1, fqcfiles2, fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3]] ]
-        .map { it -> tuple(it[0],it[1][0].flatten(),it[1][1].flatten()) }
-                                // [Project, [fqcfiles1,fqcfiles2,fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3]]
+        .mix(rrna_results)
+        .groupTuple()           // [Project, [[fqcfiles1, fqcfiles2, fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3], [rrnafiles1, rrnafiles2]] ]
+        .map { it -> tuple(it[0],it[1][0].flatten(),it[1][1].flatten(),it[1][2].flatten()) }
+                                // [Project, [fqcfiles1,fqcfiles2,fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3],[rrnafiles1, rrnafiles2]]
 
 }
 
@@ -137,9 +139,13 @@ workflow CHECK_RUN_QUALITY {
         FASTQ_SCREEN(project_and_reads,
 		     params.config_dir,
 		     params.fastqscreen_databases)
+		GET_FQSCREEN_OUTPUT(FASTQ_SCREEN.out)
+        EXTRACT_RRNA(GET_FQSCREEN_OUTPUT.out.groupTuple())
+        MERGE_PROJECT_RRNA(EXTRACT_RRNA.out.map{ it -> it[1] }.collect())
         MULTIQC_PER_FLOWCELL( params.run_folder,
             FASTQC.out.map{ it[1] }.collect(),
             FASTQ_SCREEN.out.map{ it[1] }.collect(),
+            MERGE_PROJECT_RRNA.out,
             INTEROP_SUMMARY.out.collect(),
             GET_QC_THRESHOLDS.out.collect().ifEmpty([]),
             GET_METADATA.out.collect(),
@@ -147,16 +153,66 @@ workflow CHECK_RUN_QUALITY {
             params.assets_dir,
             params.config_dir)
         MULTIQC_PER_PROJECT( params.run_folder,
-            combine_results_by_project(FASTQC.out.groupTuple(),FASTQ_SCREEN.out.groupTuple()),
+            combine_results_by_project(FASTQC.out.groupTuple(),FASTQ_SCREEN.out.groupTuple(),EXTRACT_RRNA.out.groupTuple()),
             GET_METADATA.out.collect(),
             params.assets_dir,
             params.config_dir)
-
 }
 
 // ---------------------------------------------------
 // Processes
 // ---------------------------------------------------
+
+process GET_FQSCREEN_OUTPUT {
+
+    input:
+    tuple val(project), path(result_folder)
+
+    output:
+    tuple val(project), path("*_screen.txt")
+
+    script:
+    """
+    cp \$PWD/${result_folder}/*_screen.txt .
+    """
+}
+
+process EXTRACT_RRNA {
+
+    input:
+    tuple val(project), path("rRNA/*")
+
+    output:
+    tuple val(project), path("rrna_*.tsv")
+
+    script:
+    table_file = "rrna_table.tsv"
+    plot_file = "rrna_plot.tsv"
+    """
+    find rRNA -name "*_screen.txt" -print -quit |while read f; do printf \"Sample\\t\"; grep -e '^Genome' \$f; done > ${table_file}
+    find rRNA -name "*_screen.txt" |while read f; do printf \"\$(echo \$(basename \$f) |sed -re 's/_001_screen.*//')\\t\$(grep -e '^rRNA' \$f)\\n\"; done >> ${table_file}
+    cp ${table_file} ${plot_file}
+    """
+
+}
+
+process MERGE_PROJECT_RRNA {
+
+    input:
+    path("rRNA/*.tsv")
+
+    output:
+    path("rrna_*.tsv")
+
+    script:
+    table_file = "rrna_table.tsv"
+    plot_file = "rrna_plot.tsv"
+    """
+    cat rRNA/*.tsv |head -n1 > ${table_file}
+    find rRNA -name "*.tsv" -exec tail -n+2 {} \\; | sort -u >> ${table_file}
+    cp ${table_file} ${plot_file}
+    """
+}
 
 process FASTQC {
 
@@ -260,6 +316,7 @@ process MULTIQC_PER_FLOWCELL {
     val runfolder_name              // Run folder name
     path ('FastQC/*')               // Fastqc logs
     path ('FastqScreen/*')          // Fastq screen logs
+    path ('rRNA/*')                 // Extracted rRNA values
     path ('Interop_summary/*')      // Interop log
     path qc_thresholds              // Quality check thresholds (optional)
     path sequencing_metadata        // Sequencing meta data ( custom content data )
@@ -292,7 +349,7 @@ process MULTIQC_PER_PROJECT {
 
     input:
     val runfolder_name
-    tuple val(project), path("FastQC/*"), path("FastqScreen/*")
+    tuple project, path("FastQC/*"), path("FastqScreen/*"), path("rRNA/*")
     path sequencing_metadata
     path assets                     // Staged copy of assets folder
     path config_dir                 // Staged copy of config folder

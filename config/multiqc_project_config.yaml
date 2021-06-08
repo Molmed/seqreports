@@ -12,3 +12,131 @@ table_columns_visible:
 top_modules:
     - 'custom_content'
 
+
+custom_data:
+  rrna_plot:
+    id: "rrna_plot"
+    section_name: "Ribosomal RNA - plot"
+    parent_id: "rrna"
+    parent_name: "Ribosomal RNA"
+    title: "rRNA mapping statistics extracted from FastQScreen output"
+    description: "shows the FastQScreen mapping statistics for the rRNA genome. The statistics have been extracted from the full FastQScreen output shown elsewhere in this report in order to highlight the rRNA contents."
+    file_format: "tsv"
+    plot_type: "bargraph"
+    categories:
+        - "#Unmapped"
+        - "#One_hit_one_genome"
+        - "#Multiple_hits_one_genome"
+        - "#One_hit_multiple_genomes"
+        - "Multiple_hits_multiple_genomes"
+    pconfig:
+      hide_zero_cats: False
+      cpswitch_c_active: False
+      title: "Reads mapped to rRNA genome"
+  rrna_table:
+    id: "rrna_table"
+    parent_id: "rrna"
+    parent_name: "Ribosomal RNA"
+    section_name: "Ribosomal RNA - table"
+    file_format: "tsv"
+    plot_type: "table"
+    description: "shows the FastQScreen mapping statistics for the rRNA genome. The statistics have been extracted from the full FastQScreen output shown elsewhere in this report in order to highlight the rRNA contents."
+    pconfig:
+      sortRows: True
+      table_title: "rRNA mapping statistics extracted from FastQScreen output"
+    headers:
+      "Genome":
+        title: 'Genome'
+        description: screened genome
+        hidden: True
+      "#Reads_processed":
+        namespace: 'rRNA number'
+        title: 'Reads_processed'
+        format: '{:,.0f}'
+        description: number of sampled reads for the screen
+      "#Unmapped":
+        title: 'Unmapped'
+        namespace: 'rRNA number'
+        hidden: True
+        format: '{:,.0f}'
+        description: reads with no hits in any of the screened genomes
+      "%Unmapped":
+        namespace: 'rRNA percentage'
+        title: 'Unmapped'
+        suffix: '%'
+        max: 100
+        min: 0
+        ceiling: 100
+        floor: 0
+        scale: 'RdYlGn'
+        description: reads with no hits in any of the screened genomes
+      "#One_hit_one_genome":
+        namespace: 'rRNA number'
+        title: 'One_hit_one_genome'
+        hidden: True
+        format: '{:,.0f}'
+        description: reads with a unique hit only in the specified genome
+      "%One_hit_one_genome":
+        namespace: 'rRNA percentage'
+        title: 'One_hit_one_genome'
+        suffix: '%'
+        max: 100
+        min: 0
+        ceiling: 100
+        floor: 0
+        scale: 'Reds'
+        description: reads with a unique hit only in the specified genome
+      "#Multiple_hits_one_genome":
+        namespace: 'rRNA number'
+        title: 'Multiple_hits_one_genome'
+        hidden: True
+        format: '{:,.0f}'
+        description: reads with multiple hits only in the specified genome
+      "%Multiple_hits_one_genome":
+        namespace: 'rRNA percentage'
+        title: 'Multiple_hits_one_genome'
+        suffix: '%'
+        max: 100
+        min: 0
+        ceiling: 100
+        floor: 0
+        scale: 'Reds'
+        description: reads with multiple hits only in the specified genome
+      "#One_hit_multiple_genomes":
+        namespace: 'rRNA number'
+        title: 'One_hit_multiple_genomes'
+        hidden: True
+        format: '{:,.0f}'
+        description: reads with a unique hit in multiple screened genomes
+      "%One_hit_multiple_genomes":
+        namespace: 'rRNA percentage'
+        title: 'One_hit_multiple_genomes'
+        suffix: '%'
+        max: 100
+        min: 0
+        ceiling: 100
+        floor: 0
+        scale: 'Reds'
+        description: reads with a unique hit in multiple screened genomes
+      "#Multiple_hits_multiple_genomes":
+        namespace: 'rRNA number'
+        title: 'Multiple_hits_multiple_genomes'
+        hidden: True
+        format: '{:,.0f}'
+        description: reads with multiple hits in multiple screened genomes
+      "%Multiple_hits_multiple_genomes":
+        namespace: 'rRNA percentage'
+        title: 'Multiple_hits_multiple_genomes'
+        suffix: '%'
+        max: 100
+        min: 0
+        ceiling: 100
+        floor: 0
+        scale: 'Reds'
+        description: reads with multiple hits in multiple screened genomes
+
+sp:
+  rrna_table:
+    fn: "rrna_table.tsv"
+  rrna_plot:
+    fn: "rrna_plot.tsv"

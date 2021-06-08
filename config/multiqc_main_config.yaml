@@ -23,3 +23,4 @@ custom_plot_config:
 
 remove_sections:
     - 'fastqc_sequence_counts'
+
