@@ -349,7 +349,7 @@ process MULTIQC_PER_PROJECT {
 
     input:
     val runfolder_name
-    tuple project, path("FastQC/*"), path("FastqScreen/*"), path("rRNA/*")
+    tuple val(project), path("FastQC/*"), path("FastqScreen/*"), path("rRNA/*")
     path sequencing_metadata
     path assets                     // Staged copy of assets folder
     path config_dir                 // Staged copy of config folder
