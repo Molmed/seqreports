@@ -105,13 +105,13 @@ def get_project_and_reads(run_folder) {
 def combine_results_by_project (fastqc_results,fastq_screen_results,rrna_results) {
     // fastqc_results           // [Project, [fqcfiles1, fqcfiles2, fqcfiles3]]
     // fastq_screen_results     // [Project, [fqsfiles1, fqsfiles2, fqsfiles3]]
-    // rrna_results             // [Project, [rrnafiles1, rrnafiles2]]
+    // rrna_results             // [Project, [rrnafiles1, rrnafiles2, rrnafiles3]]
 
     fastqc_results.mix(fastq_screen_results)
         .mix(rrna_results)
-        .groupTuple()           // [Project, [[fqcfiles1, fqcfiles2, fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3], [rrnafiles1, rrnafiles2]] ]
-        .map { it -> tuple(it[0],it[1][0].flatten(),it[1][1].flatten(),it[1][2].flatten()) }
-                                // [Project, [fqcfiles1,fqcfiles2,fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3],[rrnafiles1, rrnafiles2]]
+        .groupTuple()           // [Project, [[fqcfiles1, fqcfiles2, fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3], [rrnafiles1,rrnafiles2,rrnafiles3]] ]
+        .map { it -> tuple(it[0],it[1][0].flatten(),it[1][1].flatten(),it[1][2].collectFile(keepHeader:true,skip:1,sort:true)) }
+                                // [Project, [fqcfiles1,fqcfiles2,fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3],[rrnafiles1,rrnafiles2,rrnafiles3]]
 
 }
 
@@ -139,13 +139,10 @@ workflow CHECK_RUN_QUALITY {
         FASTQ_SCREEN(project_and_reads,
 		     params.config_dir,
 		     params.fastqscreen_databases)
-		GET_FQSCREEN_OUTPUT(FASTQ_SCREEN.out)
-        EXTRACT_RRNA(GET_FQSCREEN_OUTPUT.out.groupTuple())
-        MERGE_PROJECT_RRNA(EXTRACT_RRNA.out.map{ it -> it[1] }.collect())
         MULTIQC_PER_FLOWCELL( params.run_folder,
             FASTQC.out.map{ it[1] }.collect(),
-            FASTQ_SCREEN.out.map{ it[1] }.collect(),
-            MERGE_PROJECT_RRNA.out,
+            FASTQ_SCREEN.out.results.map{ it[1] }.collect(),
+            FASTQ_SCREEN.out.txt.collectFile(keepHeader:true,skip:1,sort:true),
             INTEROP_SUMMARY.out.collect(),
             GET_QC_THRESHOLDS.out.collect().ifEmpty([]),
             GET_METADATA.out.collect(),
@@ -153,7 +150,7 @@ workflow CHECK_RUN_QUALITY {
             params.assets_dir,
             params.config_dir)
         MULTIQC_PER_PROJECT( params.run_folder,
-            combine_results_by_project(FASTQC.out.groupTuple(),FASTQ_SCREEN.out.groupTuple(),EXTRACT_RRNA.out.groupTuple()),
+            combine_results_by_project(FASTQC.out.groupTuple(),FASTQ_SCREEN.out.results.groupTuple(),FASTQ_SCREEN.out.txt.groupTuple()),
             GET_METADATA.out.collect(),
             params.assets_dir,
             params.config_dir)
@@ -163,56 +160,6 @@ workflow CHECK_RUN_QUALITY {
 // Processes
 // ---------------------------------------------------
 
-process GET_FQSCREEN_OUTPUT {
-
-    input:
-    tuple val(project), path(result_folder)
-
-    output:
-    tuple val(project), path("*_screen.txt")
-
-    script:
-    """
-    cp \$PWD/${result_folder}/*_screen.txt .
-    """
-}
-
-process EXTRACT_RRNA {
-
-    input:
-    tuple val(project), path("rRNA/*")
-
-    output:
-    tuple val(project), path("rrna_*.tsv")
-
-    script:
-    table_file = "rrna_table.tsv"
-    plot_file = "rrna_plot.tsv"
-    """
-    find rRNA -name "*_screen.txt" -print -quit |while read f; do printf \"Sample\\t\"; grep -e '^Genome' \$f; done > ${table_file}
-    find rRNA -name "*_screen.txt" |while read f; do printf \"\$(echo \$(basename \$f) |sed -re 's/_001_screen.*//')\\t\$(grep -e '^rRNA' \$f)\\n\"; done >> ${table_file}
-    cp ${table_file} ${plot_file}
-    """
-
-}
-
-process MERGE_PROJECT_RRNA {
-
-    input:
-    path("rRNA/*.tsv")
-
-    output:
-    path("rrna_*.tsv")
-
-    script:
-    table_file = "rrna_table.tsv"
-    plot_file = "rrna_plot.tsv"
-    """
-    cat rRNA/*.tsv |head -n1 > ${table_file}
-    find rRNA -name "*.tsv" -exec tail -n+2 {} \\; | sort -u >> ${table_file}
-    cp ${table_file} ${plot_file}
-    """
-}
 
 process FASTQC {
 
@@ -237,9 +184,12 @@ process FASTQ_SCREEN {
     path fastqscreen_databases
 
     output:
-    tuple val(project), path("*_results")
+    tuple val(project), path("*_results"), emit: results
+    tuple val(project), path("*_results/rrna.tsv"), emit: txt
 
     script:
+    outdir = fastq_file + "_fastq_screen_results"
+    (sample_name) = (fastq_file.name =~ /^(.*_S\d+_L\d{3}_R\d+).*/)[0][1]
     """
     sed -E 's/^(THREADS[[:blank:]]+)[[:digit:]]+/\1${task.cpus}/' \\
         ${config_dir}/fastq_screen.conf > fastq_screen.conf
@@ -248,8 +198,10 @@ process FASTQ_SCREEN {
     elif [ "${fastqscreen_databases}" != "${fastqscreen_default_databases}" ]; then
         sed -i 's#${fastqscreen_default_databases}#${fastqscreen_databases}#' fastq_screen.conf
     fi
-    mkdir -p $fastq_file"_fastq_screen_results"
-    fastq_screen --conf fastq_screen.conf --outdir $fastq_file"_fastq_screen_results" $fastq_file
+    mkdir -p $outdir
+    fastq_screen --conf fastq_screen.conf --outdir $outdir $fastq_file
+    printf \"Sample\\t\"\$(grep --regexp='^Genome' --max-count=1 --no-filename $outdir/*_screen.txt) > $outdir/rrna.tsv
+    printf \"$sample_name\\t\"$(grep --regexp='^rRNA' --no-filename $outdir/*_screen.txt) >> $outdir/rrna.tsv
     """
 }
 
