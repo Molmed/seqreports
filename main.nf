@@ -203,6 +203,8 @@ process FASTQ_SCREEN {
     fi
     mkdir -p $outdir
     fastq_screen --conf fastq_screen.conf --outdir $outdir $fastq_file
+    
+    # extract rRNA numbers for custom plotting with MultiQC
     printf \"Sample\\t\" > rrna.tsv
     grep -e '^Genome' -m1 -h $outdir/*_screen.txt >> rrna.tsv
     printf \"$sample_name\\t\" >> rrna.tsv
@@ -287,6 +289,8 @@ process MULTIQC_PER_FLOWCELL {
     script:
     threshold_parameter = qc_thresholds ? "-c ${qc_thresholds}" : ""
     """
+    # making a separate file to use for plotting in MultiQC since custom content can only have one plot per section
+    # as described here: https://multiqc.info/docs/#introduction-1
     cp rRNA/rrna_table.tsv rRNA/rrna_plot.tsv
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
@@ -317,6 +321,8 @@ process MULTIQC_PER_PROJECT {
 
     script:
     """
+    # making a separate file to use for plotting in MultiQC since custom content can only have one plot per section
+    # as described here: https://multiqc.info/docs/#introduction-1
     cp rRNA/rrna_table.tsv rRNA/rrna_plot.tsv
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
