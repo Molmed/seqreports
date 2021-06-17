@@ -142,7 +142,7 @@ workflow CHECK_RUN_QUALITY {
         MULTIQC_PER_FLOWCELL( params.run_folder,
             FASTQC.out.map{ it[1] }.collect(),
             FASTQ_SCREEN.out.results.map{ it[1] }.collect(),
-            FASTQ_SCREEN.out.txt.map{ it[1] }.collectFile(keepHeader:true,skip:1,sort:true),
+            FASTQ_SCREEN.out.tsv.map{ it[1] }.collectFile(keepHeader:true,skip:1,sort:true),
             INTEROP_SUMMARY.out.collect(),
             GET_QC_THRESHOLDS.out.collect().ifEmpty([]),
             GET_METADATA.out.collect(),
@@ -153,7 +153,7 @@ workflow CHECK_RUN_QUALITY {
             combine_results_by_project(
                 FASTQC.out.groupTuple(),
                 FASTQ_SCREEN.out.results.groupTuple(),
-                FASTQ_SCREEN.out.txt),
+                FASTQ_SCREEN.out.tsv),
             GET_METADATA.out.collect(),
             params.assets_dir,
             params.config_dir)
@@ -188,7 +188,7 @@ process FASTQ_SCREEN {
 
     output:
     tuple val(project), path("*_results"), emit: results
-    tuple val(project), path("rrna.tsv"), emit: txt
+    tuple val(project), path("rrna.tsv"), emit: tsv
 
     script:
     outdir = fastq_file + "_fastq_screen_results"
