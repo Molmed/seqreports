@@ -17,3 +17,4 @@ top_modules:
     - 'custom_content'
     - 'bcl2fastq'
     - 'interop'
+
