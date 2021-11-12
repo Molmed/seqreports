@@ -15,7 +15,7 @@ params.fastqscreen_databases = fastqscreen_default_databases
 params.bcl2fastq_outdir = "Unaligned"
 params.checkqc_config = ""                       // See: https://github.com/Molmed/checkQC
 params.assets_dir = "$baseDir/assets"
-params.config_dir = "$baseDir/config"
+params.config_dir = "$baseDir/config/tool_config"
 params.script_dir = "$baseDir/bin"
 params.help = false
 
@@ -50,7 +50,7 @@ def helpMessage() {
         --bcl2fastq_outdir                  Folder name to check for fastq.gz files and demultiplexing stats (default: Unaligned)
         --checkqc_config                    Configuration file for CheckQC
         --assets_dir                        Location of project assests (default: "\$baseDir/assets").
-        --config_dir                        Location of project configuration files (default: "\$baseDir/config").
+        --config_dir                        Location of tool configuration files (default: "\$baseDir/config/tool_config").
         --script_dir                        Location of project scripts (default: "\$baseDir/bin")
 
         --help                              Print this help message.
