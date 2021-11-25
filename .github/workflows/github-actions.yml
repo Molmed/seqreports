@@ -1,0 +1,27 @@
+name: Run test profile
+on: [push]
+jobs:
+  run-test-profile:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Add NeuroDebian repo
+        run: |
+            wget -O- http://neuro.debian.net/lists/focal.de-fzj.full | tee neurodebian.sources.list
+            sudo cp neurodebian.sources.list /etc/apt/sources.list.d/
+            sudo apt-key adv --recv-keys --keyserver hkps://keyserver.ubuntu.com 0xA5D32F012649A5A9
+            sudo apt-get update
+
+      - name: Install Singularity
+        run: sudo apt-get install -y singularity-container=2.6.1-2+nd2~nd20.04+1
+
+      - name: Install Nextflow
+        run: curl -s https://get.nextflow.io | bash
+      
+      - name: Make Nextflow binary executable
+        run: chmod +x nextflow
+      
+      - name: Run test profile
+        run: ./nextflow run main.nf -profile dev,test,singularity 
