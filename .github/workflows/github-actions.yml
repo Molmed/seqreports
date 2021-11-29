@@ -7,6 +7,13 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
 
+      - name: Cache singularity images
+        uses: actions/cache@v2
+        with:
+          path: work/singularity
+          key: singularity-${{ hashFiles('config/nextflow_config/singularity.config') }}
+          restore-keys: singularity-
+
       - name: Add NeuroDebian repo
         run: |
             wget -O- http://neuro.debian.net/lists/focal.de-fzj.full | tee neurodebian.sources.list
