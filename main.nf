@@ -262,7 +262,7 @@ process INTEROP_SUMMARY {
 
     script:
     """
-    summary --csv=1 $runfolder > runfolder_summary_interop
+    interop_summary --csv=1 $runfolder > runfolder_summary_interop
     """
 }
 
