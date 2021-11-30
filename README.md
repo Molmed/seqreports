@@ -52,6 +52,27 @@ There are two primary branches of this project:
 - `master`: The stable release branch
 - `dev`: The development and test branch, to which pull requests should be made.
 
-### Known issues:
+### Running tests locally
+
+First, run the nextflow pipeline with the test profile
+```
+nextflow run main.nf -profile dev,test,singularity
+``` 
+Then run integration and unit tests.
+```
+# create virtual environment 
+virtualenv -p python3.9 venv/   
+
+# activate venv
+source venv/bin/activate
+
+# install dependencies
+pip install -r requirements.txt
+
+# run tests
+pytest tests/
+```
+
+## Known issues:
 
 - Unable to download genome indicies using `fastq_screen --get_genomes` as wget within the container does not resolve the address correctly. Fastq Screen must be installed separately (e.g. with conda) and the genomes downloaded prior to running the workflow. The path to the databases must then be given using the `params.fastqscreen_databases` parameter.
