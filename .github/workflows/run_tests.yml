@@ -1,7 +1,7 @@
-name: Run test profile
+name: Run tests
 on: [push]
 jobs:
-  run-test-profile:
+  run-tests:
     runs-on: ubuntu-20.04
     env:
       NXF_VER: 21.04.1
@@ -28,5 +28,17 @@ jobs:
       - name: Make Nextflow binary executable
         run: chmod +x nextflow
       
-      - name: Run test profile
-        run: ./nextflow run main.nf -profile dev,test,singularity 
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          architecture: x64
+
+      - name: Install test requirements
+        run: pip install -r requirements-dev.txt
+
+      - name: Run integration test
+        run: pytest -v tests
+
+      - name: Run Black code formatting check
+        run: black --check

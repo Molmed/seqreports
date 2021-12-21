@@ -67,7 +67,7 @@ virtualenv -p python3.9 venv/
 source venv/bin/activate
 
 # install dependencies
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
 # run tests
 pytest tests/
