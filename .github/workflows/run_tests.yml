@@ -23,6 +23,8 @@ jobs:
           singularity-version: 3.8.3
 
       - name: Install Nextflow
+        env:
+          CAPSULE_LOG: none
         run: |
           curl -s https://get.nextflow.io | bash
           sudo mv nextflow /usr/local/bin/
@@ -39,8 +41,8 @@ jobs:
       - name: Install test requirements
         run: pip install -r requirements-dev.txt
 
-      - name: Run integration test
-        run: pytest -v tests
+      - name: Run tests
+        run: pytest tests
 
       - name: Run Black code formatting check
         run: black --check .
