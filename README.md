@@ -29,6 +29,7 @@ These are the primary config profiles:
 - `irma`:         Uppmax slurm profile for use on the cluster `irma` (note: The parameter `params.project` must be supplied).
 - `snpseq`:       Run locally with greater memory available than `dev`.
 - `singularity`:  Enables singularity and provides container URLs.
+- `test`:         Run the pipeline using test data
 
 Additional profiles:
 - `debug`: prints out the `env` properties before executing processes.
@@ -52,13 +53,16 @@ There are two primary branches of this project:
 - `master`: The stable release branch
 - `dev`: The development and test branch, to which pull requests should be made.
 
+Tests are run through GitHub Actions when pushing code to the repo. See instructions below on how to reproduce it locally.
+
+To keep the python parts of the project nice and tidy, we enforce that code should be formatted according to [black](https://github.com/psf/black).
+To re-format your code with black, simply run:
+```
+black .
+```
+
 ### Running tests locally
 
-First, run the nextflow pipeline with the test profile
-```
-nextflow run main.nf -profile dev,test,singularity
-``` 
-Then run integration and unit tests.
 ```
 # create virtual environment 
 virtualenv -p python3.9 venv/   
@@ -71,6 +75,9 @@ pip install -r requirements-dev.txt
 
 # run tests
 pytest tests/
+
+# perform black formatter check
+black --check .
 ```
 
 ## Known issues:
