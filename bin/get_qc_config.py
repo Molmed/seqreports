@@ -13,20 +13,30 @@ class ValueHandlerMapper(object):
         self.compare_direction = compare_direction
 
 
-class HandlerMapper():
+class HandlerMapper:
     def __init__(self):
-        self._mapper_list = [ValueHandlerMapper(handler_name = 'ClusterPFHandler',
-                                                multiqc_mapping = 'total',
-                                                compare_direction = 'lt'),
-                             ValueHandlerMapper(handler_name = 'ErrorRateHandler',
-                                                multiqc_mapping = 'Error',
-                                                compare_direction = 'gt'),
-                             ValueHandlerMapper(handler_name = 'Q30Handler',
-                                                multiqc_mapping = 'percent_Q30',
-                                                compare_direction = 'lt'),
-                             ValueHandlerMapper(handler_name = 'ReadsPerSampleHandler',
-                                                multiqc_mapping = 'mqc-generalstats-bcl2fastq-total',
-                                                compare_direction = 'lt')]
+        self._mapper_list = [
+            ValueHandlerMapper(
+                handler_name="ClusterPFHandler",
+                multiqc_mapping="total",
+                compare_direction="lt",
+            ),
+            ValueHandlerMapper(
+                handler_name="ErrorRateHandler",
+                multiqc_mapping="Error",
+                compare_direction="gt",
+            ),
+            ValueHandlerMapper(
+                handler_name="Q30Handler",
+                multiqc_mapping="percent_Q30",
+                compare_direction="lt",
+            ),
+            ValueHandlerMapper(
+                handler_name="ReadsPerSampleHandler",
+                multiqc_mapping="mqc-generalstats-bcl2fastq-total",
+                compare_direction="lt",
+            ),
+        ]
 
         self.mapping = self._convert_to_mappings(self._mapper_list)
 
@@ -36,33 +46,45 @@ class HandlerMapper():
             mapper_dict[mapper.handler_name] = mapper
         return mapper_dict
 
+
 def convert_to_multiqc_config(checkqc_config_dict):
     multiqc_config_format = {}
     handler_mapper = HandlerMapper()
     for mapper_name, mapper in handler_mapper.mapping.items():
         qc_criteria = checkqc_config_dict.get(mapper.handler_name)
         multiqc_config_value = {mapper.multiqc_mapping: {}}
-        if not qc_criteria['warning'] == 'unknown':
-            multiqc_config_value[mapper.multiqc_mapping]['warn'] = [{mapper.compare_direction: qc_criteria['warning']}]
-        if not qc_criteria['error'] == 'unknown':
-            multiqc_config_value[mapper.multiqc_mapping]['fail'] = [{mapper.compare_direction: qc_criteria['error']}]
+        if not qc_criteria["warning"] == "unknown":
+            multiqc_config_value[mapper.multiqc_mapping]["warn"] = [
+                {mapper.compare_direction: qc_criteria["warning"]}
+            ]
+        if not qc_criteria["error"] == "unknown":
+            multiqc_config_value[mapper.multiqc_mapping]["fail"] = [
+                {mapper.compare_direction: qc_criteria["error"]}
+            ]
 
-        multiqc_config_format[mapper.multiqc_mapping] = multiqc_config_value[mapper.multiqc_mapping]
+        multiqc_config_format[mapper.multiqc_mapping] = multiqc_config_value[
+            mapper.multiqc_mapping
+        ]
 
-    return {'table_cond_formatting_rules': multiqc_config_format}
+    return {"table_cond_formatting_rules": multiqc_config_format}
+
 
 def convert_to_dict(checkqc_config):
     checkqc_config_dict = {}
     for qc_handler in checkqc_config:
-        checkqc_config_dict[qc_handler['name']] = qc_handler
+        checkqc_config_dict[qc_handler["name"]] = qc_handler
 
     return checkqc_config_dict
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Converts CheckQC tresholds to MultiQC conditional format')
-    parser.add_argument('--runfolder', type=str, required=True, help='Path to runfolder')
-    parser.add_argument('--config', type=str, help='Path to checkQC config')
+    parser = argparse.ArgumentParser(
+        description="Converts CheckQC tresholds to MultiQC conditional format"
+    )
+    parser.add_argument(
+        "--runfolder", type=str, required=True, help="Path to runfolder"
+    )
+    parser.add_argument("--config", type=str, help="Path to checkQC config")
 
     args = parser.parse_args()
     runfolder = args.runfolder
@@ -71,12 +93,16 @@ if __name__ == "__main__":
     run_type_recognizer = RunTypeRecognizer(runfolder)
     config = ConfigFactory.from_config_path(config)
 
-    instrument_and_reagent_version = run_type_recognizer.instrument_and_reagent_version()
+    instrument_and_reagent_version = (
+        run_type_recognizer.instrument_and_reagent_version()
+    )
     both_read_lengths = run_type_recognizer.read_length()
     read_length = int(both_read_lengths.split("-")[0])
-    checkqc_config = config.get_handler_configs(instrument_and_reagent_version, read_length)
+    checkqc_config = config.get_handler_configs(
+        instrument_and_reagent_version, read_length
+    )
     checkqc_config_dict = convert_to_dict(checkqc_config)
     multiqc_config = convert_to_multiqc_config(checkqc_config_dict)
 
-    with open('qc_thresholds.yaml', 'w') as outfile:
+    with open("qc_thresholds.yaml", "w") as outfile:
         yaml.dump(multiqc_config, outfile)

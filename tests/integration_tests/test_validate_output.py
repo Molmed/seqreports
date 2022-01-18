@@ -106,7 +106,7 @@ def test_reports_exist(flowcell_report, project_reports):
 
 
 def test_all_sections_included(
-    flowcell_report,flowcell_report_sections, project_reports, project_report_sections
+    flowcell_report, flowcell_report_sections, project_reports, project_report_sections
 ):
     def check_sections_in_reports(reports, sections):
         for report_path in reports:
