@@ -63,6 +63,8 @@ black .
 
 ### Running tests locally
 
+Assuming you have installed all pre-requisites (except the fastq screen database: test data comes with a minimal version of it), you can run tests locally by following these steps:
+
 ```
 # create virtual environment 
 virtualenv -p python3.9 venv/   
