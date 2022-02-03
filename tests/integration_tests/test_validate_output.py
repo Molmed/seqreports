@@ -7,8 +7,9 @@ from bs4 import BeautifulSoup
 import itertools
 
 
+# Run pipeline in test mode, this is done once per test session
 @pytest.fixture(scope="session", autouse=True)
-def result_dir(tmpdir_factory):
+def run_pipeline(tmpdir_factory):
     result_dir = tmpdir_factory.mktemp("results")
     subprocess.run(
         [
@@ -25,46 +26,65 @@ def result_dir(tmpdir_factory):
     yield result_dir
 
 
+# Returns directory where pipeline results have been written.
+# All tests use this folder as input, veryfing that reports
+# have been generated as expected.
 @pytest.fixture
-def flowcell_report_dir(result_dir):
-    return os.path.join(result_dir, "flowcell_report")
+def result_dir(run_pipeline):
+    return run_pipeline
 
 
-@pytest.fixture
-def project_reports_dir(result_dir):
-    return os.path.join(result_dir, "projects")
+def test_results_dirs_exist(result_dir):
+    flowcell_dir = os.path.join(result_dir, "flowcell_report")
+    projects_dir = os.path.join(result_dir, "projects")
+
+    assert os.path.isdir(flowcell_dir)
+    assert os.path.isdir(projects_dir)
 
 
-@pytest.fixture
-def projects():
-    return ["Zymo", "Qiagen", "NoProject"]
+def test_project_dirs_exist(result_dir):
+    projects_dir = os.path.join(result_dir, "projects")
+    projects = ["Zymo", "Qiagen", "NoProject"]
+
+    for project in projects:
+        assert os.path.isdir(os.path.join(projects_dir, project))
 
 
-@pytest.fixture
-def flowcell_report(flowcell_report_dir):
-    return os.path.join(
-        flowcell_report_dir, "210510_M03910_0104_000000000-JHGJL_multiqc_report.html"
+def test_flowcell_report_exist(result_dir):
+    flowcell_dir = os.path.join(result_dir, "flowcell_report")
+    report_path = os.path.join(
+        flowcell_dir, "210510_M03910_0104_000000000-JHGJL_multiqc_report.html"
     )
 
+    assert os.path.isfile(report_path)
 
-@pytest.fixture
-def project_reports(project_reports_dir, projects):
-    report_list = []
+
+def test_project_reports_exist(result_dir):
+    projects_dir = os.path.join(result_dir, "projects")
+    projects = ["Zymo", "Qiagen", "NoProject"]
+
     for project in projects:
-        report_list.append(
-            os.path.join(
-                project_reports_dir,
-                project,
-                "210510_M03910_0104_000000000-JHGJL_"
-                + project
-                + "_multiqc_report.html",
-            )
+        report_path = os.path.join(
+            projects_dir,
+            project,
+            "210510_M03910_0104_000000000-JHGJL_" + project + "_multiqc_report.html",
         )
-    return report_list
+        assert os.path.isfile(report_path)
 
 
-@pytest.fixture
-def flowcell_report_sections():
+def check_sections_in_report(report_path, sections):
+    with open(report_path, "r") as html_file:
+        parser = BeautifulSoup(html_file.read(), "lxml")
+        for section in sections:
+            hits = parser.find_all(href="#" + section)
+            assert len(hits) > 0
+
+
+def test_all_sections_included_in_flowcell_report(result_dir):
+    flowcell_dir = os.path.join(result_dir, "flowcell_report")
+    report_path = os.path.join(
+        flowcell_dir, "210510_M03910_0104_000000000-JHGJL_multiqc_report.html"
+    )
     sections = [
         "general_stats",
         "rrna",
@@ -74,11 +94,13 @@ def flowcell_report_sections():
         "fastq_screen",
         "fastqc",
     ]
-    return sections
+
+    check_sections_in_report(report_path, sections)
 
 
-@pytest.fixture
-def project_report_sections():
+def test_all_sections_included_in_project_reports(result_dir):
+    projects_dir = os.path.join(result_dir, "projects")
+    projects = ["Zymo", "Qiagen", "NoProject"]
     sections = [
         "general_stats",
         "rrna",
@@ -86,35 +108,11 @@ def project_report_sections():
         "fastq_screen",
         "fastqc",
     ]
-    return sections
 
-
-def test_results_dirs_exist(flowcell_report_dir, project_reports_dir):
-    assert os.path.isdir(flowcell_report_dir)
-    assert os.path.isdir(project_reports_dir)
-
-
-def test_project_dirs_exist(project_reports_dir, projects):
     for project in projects:
-        assert os.path.isdir(os.path.join(project_reports_dir, project))
-
-
-def test_reports_exist(flowcell_report, project_reports):
-    reports = project_reports + [flowcell_report]
-    for report in reports:
-        assert os.path.isfile(report)
-
-
-def test_all_sections_included(
-    flowcell_report, flowcell_report_sections, project_reports, project_report_sections
-):
-    def check_sections_in_reports(reports, sections):
-        for report_path in reports:
-            with open(report_path, "r") as html_file:
-                parser = BeautifulSoup(html_file.read(), "lxml")
-                for section in sections:
-                    hits = parser.find_all(href="#" + section)
-                    assert len(hits) > 0
-
-    check_sections_in_reports([flowcell_report], flowcell_report_sections)
-    check_sections_in_reports(project_reports, project_report_sections)
+        report_path = os.path.join(
+            projects_dir,
+            project,
+            "210510_M03910_0104_000000000-JHGJL_" + project + "_multiqc_report.html",
+        )
+        check_sections_in_report(report_path, sections)
