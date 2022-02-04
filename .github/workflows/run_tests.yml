@@ -1,0 +1,48 @@
+name: Run tests
+on: [push]
+jobs:
+  run-tests:
+    runs-on: ubuntu-20.04
+    env:
+      NXF_VER: 21.04.1
+      NXF_ANSI_LOG: false
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Cache singularity images
+        uses: actions/cache@v2
+        with:
+          path: work/singularity
+          key: singularity-${{ hashFiles('config/nextflow_config/singularity.config') }}
+          restore-keys: singularity-
+
+      - name: Install Singularity
+        uses: eWaterCycle/setup-singularity@v7
+        with:
+          singularity-version: 3.8.3
+
+      - name: Install Nextflow
+        env:
+          CAPSULE_LOG: none
+        run: |
+          curl -s https://get.nextflow.io | bash
+          sudo mv nextflow /usr/local/bin/
+      
+      - name: Make Nextflow binary executable
+        run: chmod +x /usr/local/bin/nextflow
+      
+      - name: Set up python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+          architecture: x64
+
+      - name: Install test requirements
+        run: pip install -r requirements-dev.txt
+
+      - name: Run tests
+        run: pytest tests
+
+      - name: Run Black code formatting check
+        run: black --check .

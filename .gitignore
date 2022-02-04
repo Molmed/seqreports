@@ -9,3 +9,5 @@ resources
 *.simg
 *.img
 FastQ_Screen_Genomes
+venv
+__pycache__

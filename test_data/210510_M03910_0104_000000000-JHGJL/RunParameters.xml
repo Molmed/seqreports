@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<RunParameters xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" LineWashRequired="false">
+  <RunParametersVersion>MiSeq_1_1</RunParametersVersion>
+  <CopyManifests>false</CopyManifests>
+  <FlowcellRFIDTag>
+    <SerialNumber>000000000-JHGJL</SerialNumber>
+    <PartNumber>15028382</PartNumber>
+    <ExpirationDate>2021-12-08T00:00:00</ExpirationDate>
+    <LotNumber>20499304</LotNumber>
+  </FlowcellRFIDTag>
+  <PR2BottleRFIDTag>
+    <SerialNumber>MS2820745-00PR2</SerialNumber>
+    <PartNumber>15041807</PartNumber>
+    <ExpirationDate>2021-12-09T00:00:00</ExpirationDate>
+    <LotNumber>20501147</LotNumber>
+  </PR2BottleRFIDTag>
+  <ReagentKitRFIDTag>
+    <SerialNumber>MS3089359-600V3</SerialNumber>
+    <PartNumber>15043962</PartNumber>
+    <ExpirationDate>2021-12-09T00:00:00</ExpirationDate>
+    <LotNumber>20509718</LotNumber>
+  </ReagentKitRFIDTag>
+  <IsStandAlone>false</IsStandAlone>
+  <Resumable>true</Resumable>
+  <ManifestFiles />
+  <AfterRunWashMethod>Post-Run Wash</AfterRunWashMethod>
+  <Setup>
+    <SupportMultipleSurfacesInUI>true</SupportMultipleSurfacesInUI>
+    <ApplicationVersion>3.1.0.13</ApplicationVersion>
+    <NumTilesPerSwath>19</NumTilesPerSwath>
+    <NumSwaths>1</NumSwaths>
+    <NumLanes>1</NumLanes>
+    <ApplicationName>MiSeq Control Software</ApplicationName>
+  </Setup>
+  <RunID>210510_M03910_0104_000000000-JHGJL</RunID>
+  <ScannerID>M03910</ScannerID>
+  <RunNumber>104</RunNumber>
+  <FPGAVersion>9.5.12</FPGAVersion>
+  <MCSVersion>3.1.0.13</MCSVersion>
+  <RTAVersion>1.18.54.4</RTAVersion>
+  <Barcode>000000000-JHGJL</Barcode>
+  <PR2BottleBarcode>MS2820745-00PR2</PR2BottleBarcode>
+  <ReagentKitPartNumberEntered>15043962</ReagentKitPartNumberEntered>
+  <ReagentKitVersion>Version3</ReagentKitVersion>
+  <ReagentKitBarcode>MS3089359-600V3</ReagentKitBarcode>
+  <PreviousPR2BottleBarcode />
+  <PreviousReagentKitBarcode />
+  <ExperimentName>Grogu_pDVT_001_Run3</ExperimentName>
+  <Chemistry>Amplicon</Chemistry>
+  <Username>svc_cpduser</Username>
+  <Workflow>
+    <Analysis>Amplicon</Analysis>
+  </Workflow>
+  <EnableAnalysis>false</EnableAnalysis>
+  <Reads>
+    <RunInfoRead Number="1" NumCycles="151" IsIndexedRead="N" />
+    <RunInfoRead Number="2" NumCycles="10" IsIndexedRead="Y" />
+    <RunInfoRead Number="3" NumCycles="10" IsIndexedRead="Y" />
+    <RunInfoRead Number="4" NumCycles="151" IsIndexedRead="N" />
+  </Reads>
+  <TempFolder>D:\Illumina\MiSeqTemp\210510_M03910_0104_000000000-JHGJL</TempFolder>
+  <AnalysisFolder>D:\Illumina\MiSeqAnalysis\210510_M03910_0104_000000000-JHGJL</AnalysisFolder>
+  <RunStartDate>210510</RunStartDate>
+  <MostRecentWashType>PostRun</MostRecentWashType>
+  <RecipeFolder>C:\Illumina\MiSeq Control Software\Recipe\V3</RecipeFolder>
+  <ILMNOnlyRecipeFolder>C:\Illumina\MiSeq Control Software\Recipe</ILMNOnlyRecipeFolder>
+  <SampleSheetName>MS3089359-600V3</SampleSheetName>
+  <SampleSheetFolder>D:\Illumina\MiSeq Control Software\SampleSheets</SampleSheetFolder>
+  <ManifestFolder>D:\Illumina\MiSeq Control Software\Manifests</ManifestFolder>
+  <OutputFolder>\\ussd-prd-isi07\COVID19seq\Grogu\SeqRuns\MiSeq_v3\210510_M03910_0104_000000000-JHGJL</OutputFolder>
+  <FocusMethod>AutoFocus</FocusMethod>
+  <SurfaceToScan>Both</SurfaceToScan>
+  <SaveFocusImages>false</SaveFocusImages>
+  <SaveScanImages>true</SaveScanImages>
+  <CloudUsername>ilmn-proj-covidseq-bssh-public-user@illumina.com</CloudUsername>
+  <RunManagementType>BaseSpaceCloud</RunManagementType>
+  <CloudRunId>206739545</CloudRunId>
+  <EnableCloud>true</EnableCloud>
+  <RunMonitoringOnly>false</RunMonitoringOnly>
+  <SendInstrumentHealthToILMN>true</SendInstrumentHealthToILMN>
+  <AmpliconWorkflowType />
+  <SelectedRun>Grogu_pDVT_001_Run3</SelectedRun>
+  <ModuleName>GenerateFastQWorkflow</ModuleName>
+  <ModuleVersion>2.0.1.17</ModuleVersion>
+  <MAPRunId>81082</MAPRunId>
+  <DxUserName />
+  <DxUserLevel />
+  <LocalRunManagerRunId>81082</LocalRunManagerRunId>
+  <ManualFlowcellEntry>false</ManualFlowcellEntry>
+  <ManualReagentEntry>false</ManualReagentEntry>
+  <ManualPR2Entry>false</ManualPR2Entry>
+</RunParameters>
