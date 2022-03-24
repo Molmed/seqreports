@@ -26,7 +26,7 @@ Awesome, you're all set! Let's try generating reports for your favourite runfold
 
 These are the primary config profiles:
 - `dev`:          Run locally with low memory.
-- `irma`:         Uppmax slurm profile for use on the cluster `irma` (note: The parameter `params.project` must be supplied).
+- `uppmax`:       Uppmax slurm profile for use on the cluster at Uppmax (note: The parameter `params.project` must be supplied).
 - `snpseq`:       Run locally with greater memory available than `dev`.
 - `singularity`:  Enables singularity and provides container URLs.
 - `test`:         Run the pipeline using test data
