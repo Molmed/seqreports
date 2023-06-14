@@ -15,6 +15,7 @@ from get_metadata import RunfolderInfo
 def runfolder_info():
     return RunfolderInfo("test_data/210510_M03910_0104_000000000-JHGJL", "Unaligned")
 
+
 @pytest.fixture
 def nested_dictionary():
     d = {"A_key": "A_val", "B_key": {"C_key": "C_val", "D_key": {"E_key": "E_val"}}}
@@ -49,7 +50,9 @@ def test_get_run_parameters(runfolder_info):
 
 
 def test_run_parameters_novaseq_x():
-    runfolder_info = RunfolderInfo("test_data/20230125_lh00103_0036_A222VGWLT3", "Unaligned")
+    runfolder_info = RunfolderInfo(
+        "test_data/20230125_lh00103_0036_A222VGWLT3", "Unaligned"
+    )
     filtered_run_parameters = runfolder_info.get_run_parameters()
     print(filtered_run_parameters)
     assert filtered_run_parameters["Instrument type"] == "NovaSeqXPlus"
