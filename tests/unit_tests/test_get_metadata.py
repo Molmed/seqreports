@@ -22,9 +22,23 @@ def nested_dictionary():
     return d
 
 
+@pytest.fixture
+def nested_dictionary_list():
+    d = {
+        "A_key": "A_val",
+        "B_key": ["Not a dict", {"C_key": "C_val"}, {"D_key": "D_val"}],
+    }
+    return d
+
+
 def test_find_function(runfolder_info, nested_dictionary):
     value = list(runfolder_info.find(nested_dictionary, "E_key"))
     assert value[0] == "E_val"
+
+
+def test_find_function_list(runfolder_info, nested_dictionary_list):
+    value = list(runfolder_info.find(nested_dictionary_list, "D_key"))
+    assert value[0] == "D_val"
 
 
 def test_read_run_parameters(runfolder_info):

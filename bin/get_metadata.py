@@ -31,14 +31,15 @@ class RunfolderInfo:
         }
 
     def find(self, d, tag):
-        if tag in d:
-            yield d[tag]
-        for k, v in d.items():
-            if isinstance(v, dict):
-                yield from self.find(v, tag)
-            if isinstance(v, list):
-                for i in v:
-                    yield from self.find(i, tag)
+        if isinstance(d, dict):
+            if tag in d:
+                yield d[tag]
+            for k, v in d.items():
+                if isinstance(v, dict):
+                    yield from self.find(v, tag)
+                if isinstance(v, list):
+                    for i in v:
+                        yield from self.find(i, tag)
 
     def read_run_parameters(self):
         alt_1 = os.path.join(self.runfolder, "runParameters.xml")
