@@ -54,7 +54,6 @@ def test_run_parameters_novaseq_x():
         "test_data/20230125_lh00103_0036_A222VGWLT3", "Unaligned"
     )
     filtered_run_parameters = runfolder_info.get_run_parameters()
-    print(filtered_run_parameters)
     assert filtered_run_parameters["Instrument type"] == "NovaSeqXPlus"
     assert filtered_run_parameters["Control software"] == "control-software"
     assert filtered_run_parameters["Control software version"] == "1.0.0.4155"
