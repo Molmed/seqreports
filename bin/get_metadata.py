@@ -17,22 +17,29 @@ class RunfolderInfo:
         self.run_parameters_tags = {
             "RunId": "Run ID",
             "RunID": "Run ID",
+            "InstrumentType": "Instrument type",
             "ApplicationName": "Control software",
             "Application": "Control software",
             "ApplicationVersion": "Control software version",
+            "SystemSuiteVersion": "Control software version",
             "Flowcell": "Flowcell type",
             "FlowCellMode": "Flowcell type",
+            "Mode": "Flowcell type",
             "ReagentKitVersion": "Reagent kit version",
             "RTAVersion": "RTA Version",
             "RtaVersion": "RTA Version",
         }
 
     def find(self, d, tag):
-        if tag in d:
-            yield d[tag]
-        for k, v in d.items():
-            if isinstance(v, dict):
-                yield from self.find(v, tag)
+        if isinstance(d, dict):
+            if tag in d:
+                yield d[tag]
+            for k, v in d.items():
+                if isinstance(v, dict):
+                    yield from self.find(v, tag)
+                if isinstance(v, list):
+                    for i in v:
+                        yield from self.find(i, tag)
 
     def read_run_parameters(self):
         alt_1 = os.path.join(self.runfolder, "runParameters.xml")
