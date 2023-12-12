@@ -115,7 +115,7 @@ class RunfolderInfo:
         results.update(self.get_run_parameters())
         flowcell_type = self.find_flowcell_type_novaseqx()
         if flowcell_type:
-            results.update(self.find_flowcell_type_novaseqx())
+            results.update(flowcell_type)
         if os.path.exists(os.path.join(self.runfolder, "bcl2fastq_version")):
             results["bcl2fastq version"] = self.get_bcl2fastq_version(self.runfolder)
         return results
