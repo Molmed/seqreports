@@ -24,7 +24,6 @@ class RunfolderInfo:
             "SystemSuiteVersion": "Control software version",
             "Flowcell": "Flowcell type",
             "FlowCellMode": "Flowcell type",
-            "Mode": "Flowcell type",
             "ReagentKitVersion": "Reagent kit version",
             "RTAVersion": "RTA Version",
             "RtaVersion": "RTA Version",
@@ -52,6 +51,21 @@ class RunfolderInfo:
                 return xmltodict.parse(f.read())
         else:
             return None
+
+    def find_flowcell_type_novaseqx(self):
+        try:
+            consumables = self.run_parameters["RunParameters"]["ConsumableInfo"][
+                "ConsumableInfo"
+            ]
+            flowcell = next(
+                consumable
+                for consumable in consumables
+                if consumable["Type"] == "FlowCell"
+            )
+            flowcell_type = flowcell.get("Name", flowcell.get("Mode"))
+        except (KeyError, StopIteration):
+            return None
+        return {"Flowcell type": flowcell_type}
 
     def read_stats_json(self, bcl2fastq_outdir):
         stats_json_path = os.path.join(
@@ -99,6 +113,9 @@ class RunfolderInfo:
     def get_info(self):
         results = self.get_read_cycles()
         results.update(self.get_run_parameters())
+        flowcell_type = self.find_flowcell_type_novaseqx()
+        if flowcell_type:
+            results.update(flowcell_type)
         if os.path.exists(os.path.join(self.runfolder, "bcl2fastq_version")):
             results["bcl2fastq version"] = self.get_bcl2fastq_version(self.runfolder)
         return results

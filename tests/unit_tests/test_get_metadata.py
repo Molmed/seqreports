@@ -71,7 +71,19 @@ def test_run_parameters_novaseq_x():
     assert filtered_run_parameters["Instrument type"] == "NovaSeqXPlus"
     assert filtered_run_parameters["Control software"] == "control-software"
     assert filtered_run_parameters["Control software version"] == "1.0.0.4155"
-    assert filtered_run_parameters["Flowcell type"] == "10B"
+
+
+def test_find_flowcell_type_novaseqx():
+    runfolder_info = RunfolderInfo(
+        "test_data/20230125_lh00103_0036_A222VGWLT3", "Unaligned"
+    )
+    flowcell_type = runfolder_info.find_flowcell_type_novaseqx()
+    assert flowcell_type["Flowcell type"] == "10B"
+    runfolder_info = RunfolderInfo(
+        "test_data/210510_M03910_0104_000000000-JHGJL", "Unaligned"
+    )
+    flowcell_type = runfolder_info.find_flowcell_type_novaseqx()
+    assert flowcell_type is None
 
 
 def test_get_read_cycles(runfolder_info):

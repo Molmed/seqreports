@@ -47,11 +47,9 @@ params.checkqc_config = '/path/to/checkqc.config'
 workDir = '/path/to/temporary/storage/space'
 ```
 
-## Development
+## Contributing and Development
 
-There are two primary branches of this project:
-- `master`: The stable release branch
-- `dev`: The development and test branch, to which pull requests should be made.
+To contribute to this repo, fork it and make a pull request to the main branch.
 
 Tests are run through GitHub Actions when pushing code to the repo. See instructions below on how to reproduce it locally.
 
