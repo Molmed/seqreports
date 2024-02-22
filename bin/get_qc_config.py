@@ -99,7 +99,8 @@ if __name__ == "__main__":
     both_read_lengths = run_type_recognizer.read_length()
     read_length = int(both_read_lengths.split("-")[0])
     checkqc_config = config.get_handler_configs(
-        instrument_and_reagent_version, read_length
+        instrument_and_reagent_version, read_length,
+        use_closest_read_length=True
     )
     checkqc_config_dict = convert_to_dict(checkqc_config)
     multiqc_config = convert_to_multiqc_config(checkqc_config_dict)
