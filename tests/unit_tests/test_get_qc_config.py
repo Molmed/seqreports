@@ -75,6 +75,5 @@ def test_convert_to_multiqc_config(checkqc_config_dict):
     multiqc_config = convert_to_multiqc_config(checkqc_config_dict)
     multiqc_section = multiqc_config["table_cond_formatting_rules"]
     assert multiqc_section["Error"]["warn"] == [{"gt": 2}]
-    assert multiqc_section["mqc-generalstats-bcl2fastq-total"]["fail"] == [{"lt": 13.5}]
     assert multiqc_section["percent_Q30"]["warn"] == [{"lt": 80}]
     assert multiqc_section["total"]["warn"] == [{"lt": 18}]

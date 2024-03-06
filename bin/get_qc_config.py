@@ -31,11 +31,6 @@ class HandlerMapper:
                 multiqc_mapping="percent_Q30",
                 compare_direction="lt",
             ),
-            ValueHandlerMapper(
-                handler_name="ReadsPerSampleHandler",
-                multiqc_mapping="mqc-generalstats-bcl2fastq-total",
-                compare_direction="lt",
-            ),
         ]
 
         self.mapping = self._convert_to_mappings(self._mapper_list)
