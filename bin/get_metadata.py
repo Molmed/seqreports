@@ -6,6 +6,7 @@ import re
 import argparse
 import os
 import json
+from pathlib import Path
 
 
 class RunfolderInfo:
@@ -82,6 +83,14 @@ class RunfolderInfo:
             bcl2fastq_str = f.read()
         return bcl2fastq_str.split("v")[1].strip()
 
+    def get_software_version(self, runfolder):
+        with open(Path(runfolder) / "pipeline_info" / "software_versions.yml") as f:
+            return dict(
+                line.strip().split(": ")
+                for line in f.readlines()
+                if line.startswith("  ")
+            )
+
     def get_run_parameters(self):
         results = OrderedDict()
         for key, value in self.run_parameters_tags.items():
@@ -116,8 +125,17 @@ class RunfolderInfo:
         flowcell_type = self.find_flowcell_type_novaseqx()
         if flowcell_type:
             results.update(flowcell_type)
-        if os.path.exists(os.path.join(self.runfolder, "bcl2fastq_version")):
+
+        try:
             results["bcl2fastq version"] = self.get_bcl2fastq_version(self.runfolder)
+        except FileNotFoundError:
+            pass
+
+        try:
+            results.update(self.get_software_version(self.runfolder))
+        except FileNotFoundError:
+            pass
+
         return results
 
 

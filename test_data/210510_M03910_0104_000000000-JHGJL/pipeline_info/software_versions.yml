@@ -1,0 +1,8 @@
+BCL2FASTQ:
+  bcl2fastq: 2.20.0.422
+CUSTOM_DUMPSOFTWAREVERSIONS:
+  python: 3.12.0
+  yaml: 6.0.1
+Workflow:
+  Nextflow: 23.04.3
+  nf-core/demultiplex: 1.5.0dev

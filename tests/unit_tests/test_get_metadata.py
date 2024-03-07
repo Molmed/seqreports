@@ -57,6 +57,18 @@ def test_bcl2fastq_version(runfolder_info):
     )
     assert bcl2fastq_version == "2.20.0.422"
 
+def test_get_software_version(runfolder_info):
+    software_versions = runfolder_info.get_software_version(
+        "test_data/210510_M03910_0104_000000000-JHGJL"
+    )
+
+    assert software_versions == {
+      "bcl2fastq": "2.20.0.422",
+      "python": "3.12.0",
+      "yaml": "6.0.1",
+      "Nextflow": "23.04.3",
+      "nf-core/demultiplex": "1.5.0dev",
+    }
 
 def test_get_run_parameters(runfolder_info):
     filtered_run_parameters = runfolder_info.get_run_parameters()
@@ -95,4 +107,4 @@ def test_get_read_cycles(runfolder_info):
 
 def test_get_info(runfolder_info):
     results = runfolder_info.get_info()
-    assert len(results) == 10
+    assert len(results) == 15
