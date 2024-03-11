@@ -7,6 +7,7 @@ import argparse
 import os
 import json
 from pathlib import Path
+import yaml
 
 
 class RunfolderInfo:
@@ -85,11 +86,11 @@ class RunfolderInfo:
 
     def get_software_version(self, runfolder):
         with open(Path(runfolder) / "pipeline_info" / "software_versions.yml") as f:
-            return dict(
-                line.strip().split(": ")
-                for line in f.readlines()
-                if line.startswith("  ")
-            )
+            return { 
+                software: version
+                for sotfware_dict in yaml.safe_load(f).values()
+                for software, version in sotfware_dict.items()
+            }
 
     def get_run_parameters(self):
         results = OrderedDict()
