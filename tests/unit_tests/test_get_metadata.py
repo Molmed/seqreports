@@ -109,4 +109,4 @@ def test_get_read_cycles(runfolder_info):
 
 def test_get_info(runfolder_info):
     results = runfolder_info.get_info()
-    assert len(results) == 15
+    assert len(results) == 9

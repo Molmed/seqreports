@@ -127,17 +127,26 @@ class RunfolderInfo:
         if flowcell_type:
             results.update(flowcell_type)
 
-        try:
-            results["bcl2fastq version"] = self.get_bcl2fastq_version(self.runfolder)
-        except FileNotFoundError:
-            pass
-
-        try:
-            results.update(self.get_software_version(self.runfolder))
-        except FileNotFoundError:
-            pass
-
         return results
+
+    def get_demultiplexing_info(self):
+        try:
+            return {
+                "Demultiplexing": {
+                    "bcl2fastq": self.get_bcl2fastq_version(self.runfolder)
+                }
+            }
+        except FileNotFoundError:
+            pass
+
+        try:
+            return {
+                "Demultiplexing": self.get_software_version(self.runfolder)
+            }
+        except FileNotFoundError:
+            pass
+
+        return {}
 
 
 if __name__ == "__main__":
@@ -157,7 +166,7 @@ if __name__ == "__main__":
     bcl2fastq_outdir = args.bcl2fastq_outdir
 
     runfolder_info = RunfolderInfo(runfolder, bcl2fastq_outdir)
-    results = runfolder_info.get_info()
+    info = runfolder_info.get_info()
 
     print(
         """
@@ -169,6 +178,11 @@ data: |
     <dl class="dl-horizontal">
 """
     )
-    for k, v in results.items():
-        print("        <dt>{}</dt><dd><samp>{}</samp></dd>".format(k, v))
+    for k, v in info.items():
+        print(f"        <dt>{k}</dt><dd><samp>{v}</samp></dd>")
+
+    print("        <dt>Demultiplexing</dt>")
+    for software, version in runfolder_info.get_demultiplexing_info().items():
+        print(f"            <dd>{software}: <samp>{version}</samp></dd>")
+
     print("    </dl>")
