@@ -86,7 +86,7 @@ class RunfolderInfo:
 
     def get_software_version(self, runfolder):
         with open(Path(runfolder) / "pipeline_info" / "software_versions.yml") as f:
-            return { 
+            return {
                 software: version
                 for sotfware_dict in yaml.safe_load(f).values()
                 for software, version in sotfware_dict.items()
@@ -140,9 +140,7 @@ class RunfolderInfo:
             pass
 
         try:
-            return {
-                "Demultiplexing": self.get_software_version(self.runfolder)
-            }
+            return {"Demultiplexing": self.get_software_version(self.runfolder)}
         except FileNotFoundError:
             pass
 
