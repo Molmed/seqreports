@@ -88,8 +88,8 @@ class RunfolderInfo:
         with open(Path(runfolder) / "pipeline_info" / "software_versions.yml") as f:
             return {
                 software: version
-                for sotfware_dict in yaml.safe_load(f).values()
-                for software, version in sotfware_dict.items()
+                for software_dict in yaml.safe_load(f).values()
+                for software, version in software_dict.items()
             }
 
     def get_run_parameters(self):
