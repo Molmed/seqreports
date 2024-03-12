@@ -6,6 +6,8 @@ import re
 import argparse
 import os
 import json
+from pathlib import Path
+import yaml
 
 
 class RunfolderInfo:
@@ -82,6 +84,14 @@ class RunfolderInfo:
             bcl2fastq_str = f.read()
         return bcl2fastq_str.split("v")[1].strip()
 
+    def get_software_version(self, runfolder):
+        with open(Path(runfolder) / "pipeline_info" / "software_versions.yml") as f:
+            return {
+                software: version
+                for software_dict in yaml.safe_load(f).values()
+                for software, version in software_dict.items()
+            }
+
     def get_run_parameters(self):
         results = OrderedDict()
         for key, value in self.run_parameters_tags.items():
@@ -116,9 +126,25 @@ class RunfolderInfo:
         flowcell_type = self.find_flowcell_type_novaseqx()
         if flowcell_type:
             results.update(flowcell_type)
-        if os.path.exists(os.path.join(self.runfolder, "bcl2fastq_version")):
-            results["bcl2fastq version"] = self.get_bcl2fastq_version(self.runfolder)
+
         return results
+
+    def get_demultiplexing_info(self):
+        try:
+            return {
+                "Demultiplexing": {
+                    "bcl2fastq": self.get_bcl2fastq_version(self.runfolder)
+                }
+            }
+        except FileNotFoundError:
+            pass
+
+        try:
+            return {"Demultiplexing": self.get_software_version(self.runfolder)}
+        except FileNotFoundError:
+            pass
+
+        return {}
 
 
 if __name__ == "__main__":
@@ -138,7 +164,7 @@ if __name__ == "__main__":
     bcl2fastq_outdir = args.bcl2fastq_outdir
 
     runfolder_info = RunfolderInfo(runfolder, bcl2fastq_outdir)
-    results = runfolder_info.get_info()
+    info = runfolder_info.get_info()
 
     print(
         """
@@ -150,6 +176,11 @@ data: |
     <dl class="dl-horizontal">
 """
     )
-    for k, v in results.items():
-        print("        <dt>{}</dt><dd><samp>{}</samp></dd>".format(k, v))
+    for k, v in info.items():
+        print(f"        <dt>{k}</dt><dd><samp>{v}</samp></dd>")
+
+    print("        <dt>Demultiplexing</dt>")
+    for software, version in runfolder_info.get_demultiplexing_info().items():
+        print(f"            <dd>{software}: <samp>{version}</samp></dd>")
+
     print("    </dl>")
