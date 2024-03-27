@@ -1,5 +1,5 @@
 pytest==6.2.5
-black==23.3.0
+black==24.3.0
 beautifulsoup4==4.10.0
 checkqc==3.6.6
 lxml==4.9.2
