@@ -24,7 +24,7 @@
 # of the sequences provided are the same length, so we've gone with 12bp
 # fragments for now.
 
-Illumina TruSeq DNA Adapter					AGATCGGAAGAG
+Illumina TruSeq Adapter					AGATCGGAAGAG
 Illumina TruSeq Small RNA Adapter				TGGAATTCTCGG
 Illumina Stranded Total RNA Prep				CTGTCTCTTATA
 PolyA										AAAAAAAAAAAA
