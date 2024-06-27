@@ -26,6 +26,6 @@
 
 Illumina TruSeq DNA Adapter					AGATCGGAAGAG
 Illumina TruSeq Small RNA Adapter				TGGAATTCTCGG
-Illumina Stranded Total RNA Prep, Ligation with Ribo-Zero Plus				CTGTCTCTTATA
+Illumina Stranded Total RNA Prep				CTGTCTCTTATA
 PolyA										AAAAAAAAAAAA
 PolyG										GGGGGGGGGGGG
