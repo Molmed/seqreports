@@ -136,10 +136,10 @@ workflow CHECK_RUN_QUALITY {
         GET_METADATA(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
         FASTQC(project_and_reads,
-             params.config_dir)
+            params.config_dir)
         FASTQ_SCREEN(project_and_reads,
-		     params.config_dir,
-		     params.fastqscreen_databases)
+            params.config_dir,
+            params.fastqscreen_databases)
         MULTIQC_PER_FLOWCELL( params.run_folder,
             FASTQC.out.map{ it[1] }.collect(),
             FASTQ_SCREEN.out.results.map{ it[1] }.collect(),
