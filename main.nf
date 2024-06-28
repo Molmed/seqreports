@@ -135,10 +135,11 @@ workflow CHECK_RUN_QUALITY {
         GET_QC_THRESHOLDS(run_folder)
         GET_METADATA(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
-        FASTQC(project_and_reads)
+        FASTQC(project_and_reads,
+            params.config_dir)
         FASTQ_SCREEN(project_and_reads,
-		     params.config_dir,
-		     params.fastqscreen_databases)
+            params.config_dir,
+            params.fastqscreen_databases)
         MULTIQC_PER_FLOWCELL( params.run_folder,
             FASTQC.out.map{ it[1] }.collect(),
             FASTQ_SCREEN.out.results.map{ it[1] }.collect(),
@@ -168,6 +169,7 @@ process FASTQC {
 
     input:
     tuple val(project), path(fastq_file)
+    path config_dir
 
     output:
     tuple val(project), path("*_results")
@@ -175,7 +177,7 @@ process FASTQC {
     script:
     """
     mkdir -p $fastq_file"_fastqc_results"
-    fastqc -t ${task.cpus} -o $fastq_file"_fastqc_results" $fastq_file
+    fastqc -t ${task.cpus} -a "${config_dir}/adapter_list_fastqc.txt" -o $fastq_file"_fastqc_results" $fastq_file
     """
 }
 
