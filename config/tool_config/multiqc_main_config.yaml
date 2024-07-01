@@ -151,3 +151,6 @@ sp:
     fn: "rrna_table.tsv"
   rrna_plot:
     fn: "rrna_plot.tsv"
+
+max_table_rows: 100000
+
