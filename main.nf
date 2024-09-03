@@ -167,6 +167,8 @@ workflow CHECK_RUN_QUALITY {
 
 process FASTQC {
 
+    label 'high_memory_and_cpus'
+
     input:
     tuple val(project), path(fastq_file)
     path config_dir
@@ -182,6 +184,8 @@ process FASTQC {
 }
 
 process FASTQ_SCREEN {
+
+    label 'high_memory_and_cpus'
 
     input:
     tuple val(project), path(fastq_file)
@@ -271,7 +275,7 @@ process INTEROP_SUMMARY {
 process MULTIQC_PER_FLOWCELL {
 
     publishDir "${params.result_dir}/flowcell_report", mode: 'copy', overwrite: true
-    label 'high_memory'
+    label 'high_memory_and_cpus'
 
     input:
     val runfolder_name              // Run folder name
