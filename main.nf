@@ -313,7 +313,7 @@ process MULTIQC_PER_FLOWCELL {
 process MULTIQC_PER_PROJECT {
 
     publishDir "${params.result_dir}/projects", mode: 'copy', overwrite: true
-    label 'high_memory'
+    label 'high_memory_and_cpus'
 
     input:
     val runfolder_name
