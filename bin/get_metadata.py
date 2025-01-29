@@ -85,7 +85,11 @@ class RunfolderInfo:
         return bcl2fastq_str.split("v")[1].strip()
 
     def get_software_version(self, runfolder):
-        with open(Path(runfolder) / "pipeline_info" / "software_versions.yml") as f:
+        with open(
+            Path(runfolder)
+            / "pipeline_info"
+            / "nf_core_pipeline_software_mqc_versions.yml"
+        ) as f:
             return {
                 software: version
                 for software_dict in yaml.safe_load(f).values()
