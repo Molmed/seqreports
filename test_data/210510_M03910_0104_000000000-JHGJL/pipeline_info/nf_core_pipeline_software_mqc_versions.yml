@@ -1,0 +1,5 @@
+BCL2FASTQ:
+  bcl2fastq: 2.20.0.422
+Workflow:
+    nf-core/demultiplex: v1.5.4
+    Nextflow: 24.04.2

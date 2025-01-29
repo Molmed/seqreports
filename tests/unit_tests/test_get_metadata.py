@@ -65,10 +65,8 @@ def test_get_software_version(runfolder_info):
 
     assert software_versions == {
         "bcl2fastq": "2.20.0.422",
-        "python": "3.12.0",
-        "yaml": "6.0.1",
-        "Nextflow": "23.04.3",
-        "nf-core/demultiplex": "1.5.0dev",
+        "Nextflow": "24.04.2",
+        "nf-core/demultiplex": "v1.5.4",
     }
 
 
