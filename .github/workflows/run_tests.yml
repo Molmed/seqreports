@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Cache singularity images
-        uses: actions/cache@v2
+        uses: actions/cache@v4.2.2
         with:
           path: work/singularity
           key: singularity-${{ hashFiles('config/nextflow_config/singularity.config') }}
