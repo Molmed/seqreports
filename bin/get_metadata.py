@@ -122,8 +122,8 @@ class RunfolderInfo:
 
             # Handle potential cases with only one Read element
             if isinstance(reads, dict):
-               reads = [reads]  # Wrap it in a list to make it iterable
-            
+                reads = [reads]  # Wrap it in a list to make it iterable
+
             for read_info in reads:
                 if read_info["@IsIndexedRead"] == "Y":
                     read_and_cycles[f"Index {index_counter} (bp)"] = read_info[
@@ -136,7 +136,7 @@ class RunfolderInfo:
                     ]
                     read_counter += 1
             return read_and_cycles
-        
+
         except TypeError:
             return read_and_cycles
 
