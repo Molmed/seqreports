@@ -13,6 +13,7 @@ import yaml
 class RunfolderInfo:
     def __init__(self, runfolder, bcl2fastq_outdir):
         self.runfolder = runfolder
+        self.run_info = self.read_run_info()
         self.run_parameters = self.read_run_parameters()
         self.stats_json = self.read_stats_json(bcl2fastq_outdir)
         self.description_and_identifier = OrderedDict()
@@ -41,6 +42,14 @@ class RunfolderInfo:
                 if isinstance(v, list):
                     for i in v:
                         yield from self.find(i, tag)
+
+    def read_run_info(self):
+        run_info = os.path.join(self.runfolder, "RunInfo.xml")
+        if os.path.exists(run_info):
+            with open(run_info) as f:
+                return xmltodict.parse(f.read())
+        else:
+            return None
 
     def read_run_parameters(self):
         alt_1 = os.path.join(self.runfolder, "runParameters.xml")
@@ -109,18 +118,25 @@ class RunfolderInfo:
         read_counter = 1
         index_counter = 1
         try:
-            for read_info in self.stats_json["ReadInfosForLanes"][0]["ReadInfos"]:
-                if read_info["IsIndexedRead"]:
+            reads = self.run_info["RunInfo"]["Run"]["Reads"]["Read"]
+
+            # Handle potential cases with only one Read element
+            if isinstance(reads, dict):
+               reads = [reads]  # Wrap it in a list to make it iterable
+            
+            for read_info in reads:
+                if read_info["@IsIndexedRead"] == "Y":
                     read_and_cycles[f"Index {index_counter} (bp)"] = read_info[
-                        "NumCycles"
+                        "@NumCycles"
                     ]
                     index_counter += 1
                 else:
                     read_and_cycles[f"Read {read_counter} (bp)"] = read_info[
-                        "NumCycles"
+                        "@NumCycles"
                     ]
                     read_counter += 1
             return read_and_cycles
+        
         except TypeError:
             return read_and_cycles
 
