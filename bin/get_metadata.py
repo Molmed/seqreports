@@ -6,6 +6,7 @@ import re
 import argparse
 import os
 import json
+from operator import itemgetter
 from pathlib import Path
 import yaml
 
@@ -124,7 +125,7 @@ class RunfolderInfo:
             if isinstance(reads, dict):
                 reads = [reads]  # Wrap it in a list to make it iterable
 
-            for read_info in reads:
+            for read_info in sorted(reads, key=itemgetter("@Number")):
                 if read_info["@IsIndexedRead"] == "Y":
                     read_and_cycles[f"Index {index_counter} (bp)"] = read_info[
                         "@NumCycles"
