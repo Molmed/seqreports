@@ -61,14 +61,6 @@ def helpMessage() {
     """
 }
 
-def printVersion() {
-
-    log.info "seqreports v${workflow.manifest.version}"
-
-}
-
-printVersion()
-
 if (params.help || !params.run_folder){
     helpMessage()
     exit 0
