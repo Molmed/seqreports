@@ -61,8 +61,6 @@ def helpMessage() {
     """
 }
 
-printVersion()
-
 if (params.help || !params.run_folder){
     helpMessage()
     exit 0
