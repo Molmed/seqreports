@@ -3,6 +3,8 @@ from __future__ import print_function
 import xmltodict
 from collections import OrderedDict
 import re
+import glob
+import csv
 import argparse
 import os
 import json
@@ -12,11 +14,12 @@ import yaml
 
 
 class RunfolderInfo:
-    def __init__(self, runfolder, bcl2fastq_outdir):
+    def __init__(self, runfolder, demultiplexer_outdir, demultiplexer):
         self.runfolder = runfolder
+        self.demultiplexer = demultiplexer
         self.run_info = self.read_run_info()
         self.run_parameters = self.read_run_parameters()
-        self.stats_json = self.read_stats_json(bcl2fastq_outdir)
+        self.stats_json = self.read_stats_json(demultiplexer_outdir, demultiplexer)
         self.description_and_identifier = OrderedDict()
         self.run_parameters_tags = {
             "RunId": "Run ID",
@@ -79,20 +82,33 @@ class RunfolderInfo:
             return None
         return {"Flowcell type": flowcell_type}
 
-    def read_stats_json(self, bcl2fastq_outdir):
+    def read_stats_json(self, demultiplexer_outdir, demultiplexer):
+        stats_path = "Reports" if demultiplexer == "bclconvert" \
+            else "Stats/Stats.json"
         stats_json_path = os.path.join(
-            self.runfolder, bcl2fastq_outdir, "Stats/Stats.json"
+            self.runfolder, demultiplexer_outdir, stats_path
         )
         if os.path.exists(stats_json_path):
-            with open(stats_json_path) as f:
-                return json.load(f)
+            if demultiplexer == "bclconvert":
+                files = glob.glob(stats_json_path + "/*.csv")
+                bclconvert_data = {}
+                for file in files:
+                    with open(file) as csvfile:
+                        reader = csv.reader(csvfile)
+                        file_name = re.sub(r".*/|\.csv", "", file)
+                        bclconvert_data[file_name] = [
+                            row for row in reader]
+                return bclconvert_data
+            else:
+                with open(stats_json_path) as f:
+                    return json.load(f)
         else:
             return None
 
-    def get_bcl2fastq_version(self, runfolder):
-        with open(os.path.join(runfolder, "bcl2fastq_version")) as f:
-            bcl2fastq_str = f.read()
-        return bcl2fastq_str.split("v")[1].strip()
+    def get_demultiplexer_version(self, runfolder):
+        with open(os.path.join(runfolder, f"{self.demultiplexer}_version")) as f:
+            demultiplexer_str = f.read()
+        return demultiplexer_str.split("v")[1].strip()
 
     def get_software_version(self, runfolder):
         with open(
@@ -154,7 +170,7 @@ class RunfolderInfo:
         try:
             return {
                 "Demultiplexing": {
-                    "bcl2fastq": self.get_bcl2fastq_version(self.runfolder)
+                    self.demultiplexer: self.get_demultiplexer_version(self.runfolder)
                 }
             }
         except FileNotFoundError:
@@ -174,17 +190,21 @@ if __name__ == "__main__":
         "--runfolder", type=str, required=True, help="Path to runfolder"
     )
     parser.add_argument(
-        "--bcl2fastq-outdir",
+        "--demultiplexer", type=str, default="bcl2fastq", help="Name of demultiplexer used"
+    )
+    parser.add_argument(
+        "--demultiplexer-outdir",
         type=str,
-        default="Data/Intensities/BaseCalls",
-        help="Path to bcl2fastq output folder relative to the runfolder",
+        default="Unaligned",
+        help="Path to demultiplexer output folder relative to the runfolder",
     )
 
     args = parser.parse_args()
     runfolder = args.runfolder
-    bcl2fastq_outdir = args.bcl2fastq_outdir
+    demultiplexer = args.demultiplexer
+    demultiplexer_outdir = args.demultiplexer_outdir
 
-    runfolder_info = RunfolderInfo(runfolder, bcl2fastq_outdir)
+    runfolder_info = RunfolderInfo(runfolder, demultiplexer_outdir, demultiplexer)
     info = runfolder_info.get_info()
 
     print(
