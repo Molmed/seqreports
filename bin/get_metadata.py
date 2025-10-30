@@ -83,7 +83,7 @@ class RunfolderInfo:
         return {"Flowcell type": flowcell_type}
 
     def read_stats_json(self, demultiplexer_outdir, demultiplexer):
-        stats_path = "Reports" if demultiplexer == "bclconvert" \
+        stats_path = "bclconvert_reports" if demultiplexer == "bclconvert" \
             else "Stats/Stats.json"
         stats_json_path = os.path.join(
             self.runfolder, demultiplexer_outdir, stats_path

@@ -9,7 +9,10 @@ import itertools
 
 # Run pipeline in test mode, this is done once per test session
 @pytest.fixture(scope="session", autouse=True)
-def run_pipeline(tmpdir_factory):
+def result_dir(request, tmpdir_factory):
+    demultiplexer = "bcl2fastq"
+    if hasattr(request, "param"):
+        demultiplexer = request.param
     result_dir = tmpdir_factory.mktemp("results")
     subprocess.run(
         [
@@ -18,20 +21,14 @@ def run_pipeline(tmpdir_factory):
             "main.nf",
             "-profile",
             "dev,test,singularity",
+            "--demultiplexer",
+            demultiplexer,
             "--result_dir",
             result_dir,
         ],
         check=True,
     )
     yield result_dir
-
-
-# Returns directory where pipeline results have been written.
-# All tests use this folder as input, veryfing that reports
-# have been generated as expected.
-@pytest.fixture
-def result_dir(run_pipeline):
-    return run_pipeline
 
 
 def test_results_dirs_exist(result_dir):
@@ -90,6 +87,25 @@ def test_all_sections_included_in_flowcell_report(result_dir):
         "rrna",
         "sequencing_metadata",
         "bcl2fastq",
+        "interop",
+        "fastq_screen",
+        "fastqc",
+    ]
+
+    check_sections_in_report(report_path, sections)
+
+
+@pytest.mark.parametrize("result_dir", ["bclconvert"], indirect=True)
+def test_all_sections_included_in_bclcovert_flowcell_report(result_dir):
+    flowcell_dir = os.path.join(result_dir, "flowcell_report")
+    report_path = os.path.join(
+        flowcell_dir, "210510_M03910_0104_000000000-JHGJL_multiqc_report.html"
+    )
+    sections = [
+        "general_stats",
+        "rrna",
+        "sequencing_metadata",
+        "bclconvert",
         "interop",
         "fastq_screen",
         "fastqc",
