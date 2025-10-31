@@ -1,0 +1,5 @@
+BCLCONVERT:
+  bclconvert: 4.3.13
+Workflow:
+    nf-core/demultiplex: v1.6.1
+    Nextflow: 24.10.5

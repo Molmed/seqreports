@@ -4,7 +4,6 @@ import pytest
 import os.path
 import subprocess
 from bs4 import BeautifulSoup
-import itertools
 
 
 # Run pipeline in test mode, this is done once per test session
@@ -13,21 +12,24 @@ def result_dir(request, tmpdir_factory):
     demultiplexer = "bcl2fastq"
     if hasattr(request, "param"):
         demultiplexer = request.param
+
     result_dir = tmpdir_factory.mktemp("results")
-    subprocess.run(
-        [
-            "nextflow",
-            "run",
-            "main.nf",
-            "-profile",
-            "dev,test,singularity",
-            "--demultiplexer",
-            demultiplexer,
-            "--result_dir",
-            result_dir,
-        ],
-        check=True,
-    )
+    cmd = [
+        "nextflow",
+        "run",
+        "main.nf",
+        "-profile",
+        "dev,test,singularity",
+        "--demultiplexer",
+        demultiplexer,
+        "--result_dir",
+        result_dir,
+    ]
+    if demultiplexer == "bclconvert":
+        cmd = [*cmd, *["--run_folder", "test_data/230825_M04034_0043_000000000-L6NVV"]]
+
+    subprocess.run(cmd, check=True)
+
     yield result_dir
 
 
@@ -99,7 +101,7 @@ def test_all_sections_included_in_flowcell_report(result_dir):
 def test_all_sections_included_in_bclcovert_flowcell_report(result_dir):
     flowcell_dir = os.path.join(result_dir, "flowcell_report")
     report_path = os.path.join(
-        flowcell_dir, "210510_M03910_0104_000000000-JHGJL_multiqc_report.html"
+        flowcell_dir, "230825_M04034_0043_000000000-L6NVV_multiqc_report.html"
     )
     sections = [
         "general_stats",

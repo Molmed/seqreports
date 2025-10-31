@@ -13,7 +13,9 @@ from get_metadata import RunfolderInfo
 
 @pytest.fixture
 def runfolder_info():
-    return RunfolderInfo("test_data/210510_M03910_0104_000000000-JHGJL", "Unaligned", "bcl2fastq")
+    return RunfolderInfo(
+        "test_data/210510_M03910_0104_000000000-JHGJL", "Unaligned", "bcl2fastq"
+    )
 
 
 @pytest.fixture

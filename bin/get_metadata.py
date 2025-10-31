@@ -83,21 +83,18 @@ class RunfolderInfo:
         return {"Flowcell type": flowcell_type}
 
     def read_stats_json(self, demultiplexer_outdir, demultiplexer):
-        stats_path = "bclconvert_reports" if demultiplexer == "bclconvert" \
-            else "Stats/Stats.json"
-        stats_json_path = os.path.join(
-            self.runfolder, demultiplexer_outdir, stats_path
-        )
+        stats_path = "Reports" if demultiplexer == "bclconvert" else "Stats/Stats.json"
+        stats_json_path = os.path.join(self.runfolder, demultiplexer_outdir, stats_path)
         if os.path.exists(stats_json_path):
             if demultiplexer == "bclconvert":
+                # Bclconvert produces multiple statistical output files
                 files = glob.glob(stats_json_path + "/*.csv")
                 bclconvert_data = {}
                 for file in files:
                     with open(file) as csvfile:
                         reader = csv.reader(csvfile)
                         file_name = re.sub(r".*/|\.csv", "", file)
-                        bclconvert_data[file_name] = [
-                            row for row in reader]
+                        bclconvert_data[file_name] = [row for row in reader]
                 return bclconvert_data
             else:
                 with open(stats_json_path) as f:
@@ -111,11 +108,12 @@ class RunfolderInfo:
         return demultiplexer_str.split("v")[1].strip()
 
     def get_software_version(self, runfolder):
-        with open(
-            Path(runfolder)
-            / "pipeline_info"
-            / "nf_core_pipeline_software_mqc_versions.yml"
-        ) as f:
+        pipeline_info_filename = (
+            "nf_core_pipeline_software_mqc_versions.yml"
+            if self.demultiplexer == "bcl2fastq"
+            else "nf_core_demultiplex_software_mqc_versions.yml"
+        )
+        with open(Path(runfolder) / "pipeline_info" / pipeline_info_filename) as f:
             return {
                 software: version
                 for software_dict in yaml.safe_load(f).values()
@@ -190,7 +188,10 @@ if __name__ == "__main__":
         "--runfolder", type=str, required=True, help="Path to runfolder"
     )
     parser.add_argument(
-        "--demultiplexer", type=str, default="bcl2fastq", help="Name of demultiplexer used"
+        "--demultiplexer",
+        type=str,
+        default="bcl2fastq",
+        help="Name of demultiplexer used",
     )
     parser.add_argument(
         "--demultiplexer-outdir",
