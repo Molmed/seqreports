@@ -49,7 +49,7 @@ def helpMessage() {
 
     Optional parameters:
         --result_dir                        Path to write results (default: results)
-        --demultiplexer_outdir              Folder name to check for fastq.gz files and demultiplexing stats (default: Unaligned)
+        --demultiplexer_outdir              Folder name to check for fastq.gz files and demultiplexing stats (default: Data/Intensities/BaseCalls)
         --checkqc_config                    Configuration file for CheckQC
         --assets_dir                        Location of project assests (default: "\$baseDir/assets").
         --config_dir                        Location of tool configuration files (default: "\$baseDir/config/tool_config").
@@ -64,11 +64,7 @@ def helpMessage() {
     """
 }
 
-if (params.help || !params.run_folder){
-    helpMessage()
-    exit 0
-}
-if (params.help || !params.demultiplexer){
+if (params.help || !params.run_folder || !params.demultiplexer){
     helpMessage()
     exit 0
 }
@@ -146,7 +142,7 @@ workflow CHECK_RUN_QUALITY {
           
         INTEROP_SUMMARY(run_folder)
         GET_QC_THRESHOLDS(run_folder)
-        GET_METADATA(run_folder, demultiplexer)
+        GET_METADATA(run_folder)
         project_and_reads = get_project_and_reads(params.run_folder)
         FASTQC(project_and_reads,
             params.config_dir)
@@ -163,8 +159,7 @@ workflow CHECK_RUN_QUALITY {
             GET_METADATA.out.collect(),
             demux_stats,
             params.assets_dir,
-            params.config_dir,
-            demultiplexer)
+            params.config_dir)
         MULTIQC_PER_PROJECT( params.run_folder,
             combine_results_by_project(
                 FASTQC.out.groupTuple(),
@@ -257,7 +252,6 @@ process GET_METADATA {
 
     input:
     path runfolder
-    val demultiplexer
 
     output:
     path 'sequencing_metadata_mqc.yaml'
@@ -270,7 +264,6 @@ process GET_METADATA {
     }
     """
     python ${params.script_dir}/get_metadata.py --runfolder $runfolder \\
-        --demultiplexer $demultiplexer \\
         $demultiplexer_outdir_section &> sequencing_metadata_mqc.yaml
     """
 }
@@ -305,13 +298,7 @@ process MULTIQC_PER_FLOWCELL {
     path demux_stats                // demux logs
     path assets                     // Staged copy of assets folder
     path config_dir                 // Staged copy of config folder
-    val demultiplexer               // Demultiplexer name
 
-    script:
-    // """
-    // echo $demux_stats
-    // echo demultiplexer: $demultiplexer
-    // """
     output:
     tuple path("*multiqc_report.html"), path("*_data.zip")
 
@@ -326,7 +313,7 @@ process MULTIQC_PER_FLOWCELL {
         --title "Flowcell report for \${RUNFOLDER}" \\
         --filename \${RUNFOLDER}_multiqc_report.html -z \\
         -c ${config_dir}/multiqc_main_config.yaml \\
-        -c ${config_dir}/${demultiplexer}/multiqc_flowcell_config.yaml \\
+        -c ${config_dir}/multiqc_flowcell_config.yaml \\
         ${threshold_parameter} \\
         .
     """

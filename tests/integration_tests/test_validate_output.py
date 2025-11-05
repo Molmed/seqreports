@@ -9,30 +9,30 @@ from bs4 import BeautifulSoup
 # Run pipeline in test mode, this is done once per test session
 @pytest.fixture(scope="session", autouse=True)
 def result_dir(request, tmpdir_factory):
-    demultiplexer = "bcl2fastq"
-    if hasattr(request, "param"):
-        demultiplexer = request.param
+    demultiplexer = request.param
 
     result_dir = tmpdir_factory.mktemp("results")
-    cmd = [
-        "nextflow",
-        "run",
-        "main.nf",
-        "-profile",
-        "dev,test,singularity",
-        "--demultiplexer",
-        demultiplexer,
-        "--result_dir",
-        result_dir,
-    ]
-    if demultiplexer == "bclconvert":
-        cmd = [*cmd, *["--run_folder", "test_data/230825_M04034_0043_000000000-L6NVV"]]
+    extra_profile = "test_bclconvert" if demultiplexer == "bclconvert" else "test"
 
-    subprocess.run(cmd, check=True)
+    subprocess.run(
+        [
+            "nextflow",
+            "run",
+            "main.nf",
+            "-profile",
+            f"dev,{extra_profile},singularity",
+            "--demultiplexer",
+            demultiplexer,
+            "--result_dir",
+            result_dir,
+        ],
+        check=True,
+    )
 
     yield result_dir
 
 
+@pytest.mark.parametrize("result_dir", ["bcl2fastq"], indirect=True)
 def test_results_dirs_exist(result_dir):
     flowcell_dir = os.path.join(result_dir, "flowcell_report")
     projects_dir = os.path.join(result_dir, "projects")
@@ -41,6 +41,7 @@ def test_results_dirs_exist(result_dir):
     assert os.path.isdir(projects_dir)
 
 
+@pytest.mark.parametrize("result_dir", ["bcl2fastq"], indirect=True)
 def test_project_dirs_exist(result_dir):
     projects_dir = os.path.join(result_dir, "projects")
     projects = ["Zymo", "Qiagen", "NoProject"]
@@ -49,6 +50,7 @@ def test_project_dirs_exist(result_dir):
         assert os.path.isdir(os.path.join(projects_dir, project))
 
 
+@pytest.mark.parametrize("result_dir", ["bcl2fastq"], indirect=True)
 def test_flowcell_report_exist(result_dir):
     flowcell_dir = os.path.join(result_dir, "flowcell_report")
     report_path = os.path.join(
@@ -58,6 +60,7 @@ def test_flowcell_report_exist(result_dir):
     assert os.path.isfile(report_path)
 
 
+@pytest.mark.parametrize("result_dir", ["bcl2fastq"], indirect=True)
 def test_project_reports_exist(result_dir):
     projects_dir = os.path.join(result_dir, "projects")
     projects = ["Zymo", "Qiagen", "NoProject"]
@@ -71,6 +74,7 @@ def test_project_reports_exist(result_dir):
         assert os.path.isfile(report_path)
 
 
+@pytest.mark.parametrize("result_dir", ["bcl2fastq"], indirect=True)
 def check_sections_in_report(report_path, sections):
     with open(report_path, "r") as html_file:
         parser = BeautifulSoup(html_file.read(), "lxml")
@@ -79,6 +83,7 @@ def check_sections_in_report(report_path, sections):
             assert len(hits) > 0
 
 
+@pytest.mark.parametrize("result_dir", ["bcl2fastq"], indirect=True)
 def test_all_sections_included_in_flowcell_report(result_dir):
     flowcell_dir = os.path.join(result_dir, "flowcell_report")
     report_path = os.path.join(
@@ -116,6 +121,7 @@ def test_all_sections_included_in_bclcovert_flowcell_report(result_dir):
     check_sections_in_report(report_path, sections)
 
 
+@pytest.mark.parametrize("result_dir", ["bcl2fastq"], indirect=True)
 def test_all_sections_included_in_project_reports(result_dir):
     projects_dir = os.path.join(result_dir, "projects")
     projects = ["Zymo", "Qiagen", "NoProject"]

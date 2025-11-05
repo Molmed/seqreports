@@ -3,6 +3,7 @@
 run_modules:
     - fastqc
     - fastq_screen
+    - bcl2fastq
     - bclconvert
     - interop
     - custom_content
@@ -15,6 +16,6 @@ table_columns_visible:
 
 top_modules:
     - 'custom_content'
-    - 'bclconvert'
+    - 'bcl2fastq'
     - 'interop'
 
