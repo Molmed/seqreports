@@ -257,14 +257,9 @@ process GET_METADATA {
     path 'sequencing_metadata_mqc.yaml'
 
     script:
-    if ( params.demultiplexer_outdir ){
-        demultiplexer_outdir_section = "--demultiplexer-outdir ${params.demultiplexer_outdir}"
-    } else {
-        demultiplexer_outdir_section = ""
-    }
     """
     python ${params.script_dir}/get_metadata.py --runfolder $runfolder \\
-        $demultiplexer_outdir_section &> sequencing_metadata_mqc.yaml
+        &> sequencing_metadata_mqc.yaml
     """
 }
 

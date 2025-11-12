@@ -14,7 +14,7 @@ import yaml
 
 
 class RunfolderInfo:
-    def __init__(self, runfolder, demultiplexer_outdir):
+    def __init__(self, runfolder):
         self.runfolder = runfolder
         self.run_info = self.read_run_info()
         self.run_parameters = self.read_run_parameters()
@@ -158,9 +158,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     runfolder = args.runfolder
-    demultiplexer_outdir = args.demultiplexer_outdir
 
-    runfolder_info = RunfolderInfo(runfolder, demultiplexer_outdir)
+    runfolder_info = RunfolderInfo(runfolder)
     info = runfolder_info.get_info()
 
     print(
