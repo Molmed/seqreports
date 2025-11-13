@@ -49,7 +49,7 @@ def helpMessage() {
 
     Optional parameters:
         --result_dir                        Path to write results (default: results)
-        --demultiplexer_outdir              Folder name to check for fastq.gz files and demultiplexing stats (default: Data/Intensities/BaseCalls)
+        --demultiplexer_outdir              Folder name to check for fastq.gz files and demultiplexing stats (default: Unaligned)
         --checkqc_config                    Configuration file for CheckQC
         --assets_dir                        Location of project assests (default: "\$baseDir/assets").
         --config_dir                        Location of tool configuration files (default: "\$baseDir/config/tool_config").

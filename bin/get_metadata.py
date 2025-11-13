@@ -149,12 +149,6 @@ if __name__ == "__main__":
     parser.add_argument(
         "--runfolder", type=str, required=True, help="Path to runfolder"
     )
-    parser.add_argument(
-        "--demultiplexer-outdir",
-        type=str,
-        default="Data/Intensities/BaseCalls",
-        help="Path to demultiplexer output folder relative to the runfolder",
-    )
 
     args = parser.parse_args()
     runfolder = args.runfolder
