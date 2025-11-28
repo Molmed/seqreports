@@ -12,7 +12,9 @@ params.run_folder = "/path/to/run_folder"
 params.result_dir = "results"
 fastqscreen_default_databases = "FastQ_Screen_Genomes"
 params.fastqscreen_databases = fastqscreen_default_databases
-params.bcl2fastq_outdir = "Unaligned"
+params.demultiplexer = "bcl2fastq"
+params.demultiplexer_outdir = "Unaligned"
+
 params.checkqc_config = ""                       // See: https://github.com/Molmed/checkQC
 params.assets_dir = "$baseDir/assets"
 params.config_dir = "$baseDir/config/tool_config"
@@ -47,11 +49,12 @@ def helpMessage() {
 
     Optional parameters:
         --result_dir                        Path to write results (default: results)
-        --bcl2fastq_outdir                  Folder name to check for fastq.gz files and demultiplexing stats (default: Unaligned)
+        --demultiplexer_outdir              Folder name to check for fastq.gz files and demultiplexing stats (default: Unaligned)
         --checkqc_config                    Configuration file for CheckQC
         --assets_dir                        Location of project assests (default: "\$baseDir/assets").
         --config_dir                        Location of tool configuration files (default: "\$baseDir/config/tool_config").
         --script_dir                        Location of project scripts (default: "\$baseDir/bin")
+        --demultiplexer                     Name of demultiplexer used e.g 'bcl2fastq' or 'bclconvert'
 
         --help                              Print this help message.
 
@@ -61,7 +64,7 @@ def helpMessage() {
     """
 }
 
-if (params.help || !params.run_folder){
+if (params.help || !params.run_folder || !params.demultiplexer){
     helpMessage()
     exit 0
 }
@@ -72,7 +75,8 @@ workflow {
     Channel.fromPath(params.run_folder,checkIfExists:true)
         .ifEmpty { "Error: No run folder (--run_folder) given."; exit 1 }
         .set {run_folder}
-    CHECK_RUN_QUALITY(run_folder)
+    Channel.value(params.demultiplexer).set {demultiplexer}
+    CHECK_RUN_QUALITY(run_folder, demultiplexer)
 
 }
 
@@ -83,13 +87,13 @@ workflow.onComplete {
 def get_project_and_reads(run_folder) {
 
     Channel
-        .fromPath("${run_folder}/${params.bcl2fastq_outdir}/**.fastq.gz" )
+        .fromPath("${run_folder}/${params.demultiplexer_outdir}/**.fastq.gz" )
         .filter( ~/.*_[^I]\d_001\.fastq\.gz$/ )
         .ifEmpty { "Error: No fastq files found under ${run_folder}/ !\n"; exit 1 }
         .map {
             it.toString().indexOf('Undetermined') > 0 ?
                 ['NoProject', it] :
-                [(it.toString() =~ /^.*\/${params.bcl2fastq_outdir}\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
+                [(it.toString() =~ /^.*\/${params.demultiplexer_outdir}\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
         }
 
 }
@@ -121,8 +125,21 @@ workflow CHECK_RUN_QUALITY {
 
     take:
         run_folder
+        demultiplexer
 
     main:
+        if (params.demultiplexer == 'bclconvert') {
+            Channel.fromPath([
+            "${params.run_folder}/${params.demultiplexer_outdir}/Reports/*.csv",
+            "${params.run_folder}/RunInfo.xml"])
+            .collect().ifEmpty([])
+            .set { demux_stats }
+        } else {
+            Channel.fromPath("${params.run_folder}/${params.demultiplexer_outdir}/Stats/Stats.json")
+                .collect().ifEmpty([])
+                .set { demux_stats }
+        }
+          
         INTEROP_SUMMARY(run_folder)
         GET_QC_THRESHOLDS(run_folder)
         GET_METADATA(run_folder)
@@ -132,14 +149,15 @@ workflow CHECK_RUN_QUALITY {
         FASTQ_SCREEN(project_and_reads,
             params.config_dir,
             params.fastqscreen_databases)
-        MULTIQC_PER_FLOWCELL( params.run_folder,
+        MULTIQC_PER_FLOWCELL( 
+            params.run_folder,
             FASTQC.out.map{ it[1] }.collect(),
             FASTQ_SCREEN.out.results.map{ it[1] }.collect(),
             FASTQ_SCREEN.out.tsv.map{ it[1] }.collectFile(keepHeader:true,skip:1,sort:true),
             INTEROP_SUMMARY.out.collect(),
             GET_QC_THRESHOLDS.out.collect().ifEmpty([]),
             GET_METADATA.out.collect(),
-            Channel.fromPath("${params.run_folder}/${params.bcl2fastq_outdir}/Stats/Stats.json").collect().ifEmpty([]),
+            demux_stats,
             params.assets_dir,
             params.config_dir)
         MULTIQC_PER_PROJECT( params.run_folder,
@@ -239,14 +257,9 @@ process GET_METADATA {
     path 'sequencing_metadata_mqc.yaml'
 
     script:
-    if ( params.bcl2fastq_outdir ){
-        bcl2fastq_outdir_section = "--bcl2fastq-outdir ${params.bcl2fastq_outdir}"
-    } else {
-        bcl2fastq_outdir_section = ""
-    }
     """
     python ${params.script_dir}/get_metadata.py --runfolder $runfolder \\
-        $bcl2fastq_outdir_section &> sequencing_metadata_mqc.yaml
+        &> sequencing_metadata_mqc.yaml
     """
 }
 
@@ -277,7 +290,7 @@ process MULTIQC_PER_FLOWCELL {
     path ('Interop_summary/*')      // Interop log
     path qc_thresholds              // Quality check thresholds (optional)
     path sequencing_metadata        // Sequencing meta data ( custom content data )
-    path bcl2fastq_stats            // Bcl2Fastq logs
+    path demux_stats                // demux logs
     path assets                     // Staged copy of assets folder
     path config_dir                 // Staged copy of config folder
 

@@ -1,0 +1,29 @@
+[Header],,
+FileFormatVersion,2,
+RunDescription,Pillar Multi-Cancer with CNV and RNA Fusion panel using TSO Comprehensive DNA and RNA controls as inputs,
+RunName,Pillar Multi-Cancer with CNV and RNA Fusion Panel,
+,,
+[Reads],,
+Index1Cycles,8,
+Index2Cycles,8,
+Read1Cycles,151,
+Read2Cycles,151,
+,,
+[BCLConvert_Settings],,
+MaskShortReads,35,
+FastqCompressionFormat,gzip,
+,,
+[BCLConvert_Data],,
+Lane,Sample_ID,index,index2,Sample_Project,OverrideCycles,custom_Description
+1,Sample_TSOCDNA-25ng-MultiCancerDNA-rep1,ATTACTCG,CCTATCCT,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCDNA-25ng-MultiCancerDNA-rep2,TCCGGAGA,CCTATCCT,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCDNA-25ng-MultiCancerDNA-rep3,CGCTCATT,CCTATCCT,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCDNA-50ng-MultiCancerDNA-rep1,GAGATTCC,CCTATCCT,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCDNA-50ng-MultiCancerDNA-rep2,ATTCAGAA,CCTATCCT,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCDNA-50ng-MultiCancerDNA-rep3,GAATTCGT,CCTATCCT,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCRNA-25ng-MultiCancerRNA-rep1,ATTACTCG,GGCTCTGA,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCRNA-25ng-MultiCancerRNA-rep2,TCCGGAGA,GGCTCTGA,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCRNA-25ng-MultiCancerRNA-rep3,CGCTCATT,GGCTCTGA,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCRNA-50ng-MultiCancerRNA-rep1,GAGATTCC,GGCTCTGA,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCRNA-50ng-MultiCancerRNA-rep2,ATTCAGAA,GGCTCTGA,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1
+1,Sample_TSOCRNA-50ng-MultiCancerRNA-rep3,GAATTCGT,GGCTCTGA,Y151;I8;I8;Y151,AB-1234,LIBRARY_NAME:Pool1

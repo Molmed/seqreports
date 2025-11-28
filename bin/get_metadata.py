@@ -3,6 +3,8 @@ from __future__ import print_function
 import xmltodict
 from collections import OrderedDict
 import re
+import glob
+import csv
 import argparse
 import os
 import json
@@ -12,11 +14,10 @@ import yaml
 
 
 class RunfolderInfo:
-    def __init__(self, runfolder, bcl2fastq_outdir):
+    def __init__(self, runfolder):
         self.runfolder = runfolder
         self.run_info = self.read_run_info()
         self.run_parameters = self.read_run_parameters()
-        self.stats_json = self.read_stats_json(bcl2fastq_outdir)
         self.description_and_identifier = OrderedDict()
         self.run_parameters_tags = {
             "RunId": "Run ID",
@@ -79,27 +80,11 @@ class RunfolderInfo:
             return None
         return {"Flowcell type": flowcell_type}
 
-    def read_stats_json(self, bcl2fastq_outdir):
-        stats_json_path = os.path.join(
-            self.runfolder, bcl2fastq_outdir, "Stats/Stats.json"
-        )
-        if os.path.exists(stats_json_path):
-            with open(stats_json_path) as f:
-                return json.load(f)
-        else:
-            return None
-
-    def get_bcl2fastq_version(self, runfolder):
-        with open(os.path.join(runfolder, "bcl2fastq_version")) as f:
-            bcl2fastq_str = f.read()
-        return bcl2fastq_str.split("v")[1].strip()
-
     def get_software_version(self, runfolder):
-        with open(
-            Path(runfolder)
-            / "pipeline_info"
-            / "nf_core_pipeline_software_mqc_versions.yml"
-        ) as f:
+        pipeline_dir = Path(runfolder) / "pipeline_info"
+        pipeline_info_filename = next(pipeline_dir.glob("*_software_mqc_versions.yml"))
+
+        with open(pipeline_info_filename) as f:
             return {
                 software: version
                 for software_dict in yaml.safe_load(f).values()
@@ -152,15 +137,6 @@ class RunfolderInfo:
 
     def get_demultiplexing_info(self):
         try:
-            return {
-                "Demultiplexing": {
-                    "bcl2fastq": self.get_bcl2fastq_version(self.runfolder)
-                }
-            }
-        except FileNotFoundError:
-            pass
-
-        try:
             return {"Demultiplexing": self.get_software_version(self.runfolder)}
         except FileNotFoundError:
             pass
@@ -173,18 +149,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--runfolder", type=str, required=True, help="Path to runfolder"
     )
-    parser.add_argument(
-        "--bcl2fastq-outdir",
-        type=str,
-        default="Data/Intensities/BaseCalls",
-        help="Path to bcl2fastq output folder relative to the runfolder",
-    )
 
     args = parser.parse_args()
     runfolder = args.runfolder
-    bcl2fastq_outdir = args.bcl2fastq_outdir
 
-    runfolder_info = RunfolderInfo(runfolder, bcl2fastq_outdir)
+    runfolder_info = RunfolderInfo(runfolder)
     info = runfolder_info.get_info()
 
     print(

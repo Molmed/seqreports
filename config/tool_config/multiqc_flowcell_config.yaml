@@ -4,6 +4,7 @@ run_modules:
     - fastqc
     - fastq_screen
     - bcl2fastq
+    - bclconvert
     - interop
     - custom_content
 

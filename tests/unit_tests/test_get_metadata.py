@@ -13,7 +13,7 @@ from get_metadata import RunfolderInfo
 
 @pytest.fixture
 def runfolder_info():
-    return RunfolderInfo("test_data/210510_M03910_0104_000000000-JHGJL", "Unaligned")
+    return RunfolderInfo("test_data/210510_M03910_0104_000000000-JHGJL")
 
 
 @pytest.fixture
@@ -46,18 +46,6 @@ def test_read_run_parameters(runfolder_info):
     assert len(run_parameters["RunParameters"]) == 63
 
 
-def test_read_stats_json(runfolder_info):
-    stats_json = runfolder_info.read_stats_json("Unaligned")
-    assert len(stats_json) == 6
-
-
-def test_bcl2fastq_version(runfolder_info):
-    bcl2fastq_version = runfolder_info.get_bcl2fastq_version(
-        "test_data/210510_M03910_0104_000000000-JHGJL"
-    )
-    assert bcl2fastq_version == "2.20.0.422"
-
-
 def test_get_software_version(runfolder_info):
     software_versions = runfolder_info.get_software_version(
         "test_data/210510_M03910_0104_000000000-JHGJL"
@@ -76,9 +64,7 @@ def test_get_run_parameters(runfolder_info):
 
 
 def test_run_parameters_novaseq_x():
-    runfolder_info = RunfolderInfo(
-        "test_data/20230125_lh00103_0036_A222VGWLT3", "Unaligned"
-    )
+    runfolder_info = RunfolderInfo("test_data/20230125_lh00103_0036_A222VGWLT3")
     filtered_run_parameters = runfolder_info.get_run_parameters()
     assert filtered_run_parameters["Instrument type"] == "NovaSeqXPlus"
     assert filtered_run_parameters["Control software"] == "control-software"
@@ -86,14 +72,10 @@ def test_run_parameters_novaseq_x():
 
 
 def test_find_flowcell_type_novaseqx():
-    runfolder_info = RunfolderInfo(
-        "test_data/20230125_lh00103_0036_A222VGWLT3", "Unaligned"
-    )
+    runfolder_info = RunfolderInfo("test_data/20230125_lh00103_0036_A222VGWLT3")
     flowcell_type = runfolder_info.find_flowcell_type_novaseqx()
     assert flowcell_type["Flowcell type"] == "10B"
-    runfolder_info = RunfolderInfo(
-        "test_data/210510_M03910_0104_000000000-JHGJL", "Unaligned"
-    )
+    runfolder_info = RunfolderInfo("test_data/210510_M03910_0104_000000000-JHGJL")
     flowcell_type = runfolder_info.find_flowcell_type_novaseqx()
     assert flowcell_type is None
 
