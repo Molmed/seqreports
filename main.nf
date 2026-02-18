@@ -87,15 +87,15 @@ workflow.onComplete {
 def get_project_and_reads(run_folder) {
 
     Channel
-        .fromPath("${run_folder}/${params.demultiplexer_outdir}/**.fastq.gz" )
-        .filter( ~/.*_[^I]\d_001\.fastq\.gz$/ )
-        .ifEmpty { "Error: No fastq files found under ${run_folder}/ !\n"; exit 1 }
-        .map {
-            it.toString().indexOf('Undetermined') > 0 ?
-                ['NoProject', it] :
-                [(it.toString() =~ /^.*\/${params.demultiplexer_outdir}\/([^\/]+)\/.*\.fastq\.gz$/)[0][1],it]
+        .fromPath("${run_folder}/${params.demultiplexer_outdir}/**.fastq.gz")
+        .filter { file -> file.name =~ /.*_[^I]\d_001\.fastq\.gz$/ }
+        .filter { file -> file.size() > 0 }
+        .ifEmpty { error "Error: No fastq files found under ${run_folder}/!" }
+        .map { file ->
+            file.toString().indexOf('Undetermined') > 0 ?
+                ['NoProject', file] :
+                [(file.toString() =~ /^.*\/${params.demultiplexer_outdir}\/([^\/]+)\/.*\.fastq\.gz$/)[0][1], file]
         }
-
 }
 
 def combine_results_by_project (fastqc_results,fastq_screen_results,rrna_results) {
