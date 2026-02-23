@@ -89,7 +89,7 @@ def get_project_and_reads(run_folder) {
     Channel
         .fromPath("${run_folder}/${params.demultiplexer_outdir}/**.fastq.gz")
         .filter { file -> file.name =~ /.*_[^I]\d_001\.fastq\.gz$/ }
-        .filter { file -> file.size() > 0 }
+        .filter { file -> file.size() > 100 } // An empty gzip file is ~ 50 bytes in size
         .ifEmpty { error "Error: No fastq files found under ${run_folder}/!" }
         .map { file ->
             file.toString().indexOf('Undetermined') > 0 ?
