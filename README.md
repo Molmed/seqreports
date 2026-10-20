@@ -30,10 +30,11 @@ These are the primary config profiles:
 - `snpseq`:       Run locally with greater memory available than `dev`.
 - `singularity`:  Enables singularity and provides container URLs.
 - `test`:         Run the pipeline using test data
+- `test_bclconvert`: Run the pipeline using BCL Convert test data
 
 Additional profiles:
 - `debug`: prints out the `env` properties before executing processes.
-
+i
 ### Supplying a custom config file
 
 Custom config files can contain all command line parameters, nextflow parameters, and overriding options.
@@ -46,7 +47,7 @@ params.fastqscreen_databases = '/path/to/databases'
 params.checkqc_config = '/path/to/checkqc.config'
 workDir = '/path/to/temporary/storage/space'
 ```
-
+i
 ## Contributing and Development
 
 To contribute to this repo, fork it and make a pull request to the main branch.
