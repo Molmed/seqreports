@@ -30,6 +30,7 @@ These are the primary config profiles:
 - `snpseq`:       Run locally with greater memory available than `dev`.
 - `singularity`:  Enables singularity and provides container URLs.
 - `test`:         Run the pipeline using test data
+- `test_bclconvert`: Run the pipeline using BCL Convert test data
 
 Additional profiles:
 - `debug`: prints out the `env` properties before executing processes.

@@ -127,7 +127,6 @@ def test_all_sections_included_in_project_reports(result_dir):
     projects = ["Zymo", "Qiagen", "NoProject"]
     sections = [
         "general_stats",
-        "rrna",
         "sequencing_metadata",
         "fastq_screen",
         "fastqc",

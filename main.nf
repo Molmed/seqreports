@@ -98,16 +98,12 @@ def get_project_and_reads(run_folder) {
         }
 }
 
-def combine_results_by_project (fastqc_results,fastq_screen_results,rrna_results) {
+def combine_results_by_project (fastqc_results,fastq_screen_results) {
     // fastqc_results           // [Project, [fqcfiles1, fqcfiles2, fqcfiles3]]
     // fastq_screen_results     // [Project, [fqsfiles1, fqsfiles2, fqsfiles3]]
-    // rrna_results             // [Project, [rrnafiles1, rrnafiles2, rrnafiles3]]
 
     fastqc_results.join(fastq_screen_results)
-        .join(
-            rrna_results.collectFile(keepHeader:true,skip:1,sort:true) { it -> ["${it[0]}_rrna_table.tsv", it[1]] }
-            .map { it -> tuple((it.name - ~/_rrna_table.tsv/), [it]) })
-    // [Project, [fqcfiles1,fqcfiles2,fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3],[Project_rrna_table.tsv]]
+    // [Project, [fqcfiles1,fqcfiles2,fqcfiles3],[fqsfiles1,fqsfiles2,fqsfiles3]]
 
 }
 
@@ -164,7 +160,7 @@ workflow CHECK_RUN_QUALITY {
             combine_results_by_project(
                 FASTQC.out.groupTuple(),
                 FASTQ_SCREEN.out.results.groupTuple(),
-                FASTQ_SCREEN.out.tsv),
+            ),
             GET_METADATA.out.collect(),
             params.assets_dir,
             params.config_dir)
@@ -322,7 +318,7 @@ process MULTIQC_PER_PROJECT {
 
     input:
     val runfolder_name
-    tuple val(project), path("FastQC/*"), path("FastqScreen/*"), path("rRNA/rrna_table.tsv")
+    tuple val(project), path("FastQC/*"), path("FastqScreen/*")
     path sequencing_metadata
     path assets                     // Staged copy of assets folder
     path config_dir                 // Staged copy of config folder
@@ -334,7 +330,6 @@ process MULTIQC_PER_PROJECT {
     """
     # making a separate file to use for plotting in MultiQC since custom content can only have one plot per section
     # as described here: https://multiqc.info/docs/#introduction-1
-    cp rRNA/rrna_table.tsv rRNA/rrna_plot.tsv
     RUNFOLDER=\$( basename ${runfolder_name} )
     multiqc \\
         --title "Report for project ${project} on runfolder \${RUNFOLDER}" \\
