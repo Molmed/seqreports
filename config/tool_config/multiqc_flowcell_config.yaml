@@ -15,8 +15,8 @@ table_columns_visible:
         total_sequences: False
 
 top_modules:
+    - 'bclconvert'
     - 'custom_content'
     - 'bcl2fastq'
-    - 'bclconvert'
     - 'interop'
 
