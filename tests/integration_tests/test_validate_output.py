@@ -139,9 +139,9 @@ def test_all_sections_included_in_project_reports(result_dir):
         check_sections_in_report(report_path, sections)
 
 @pytest.mark.parametrize("result_dir", ["bclconvert"], indirect=True)
-def test_all_sections_included_in_bcl_convert_project_reports(result_dir):
+def test_all_sections_included_in_bclconvert_project_reports(result_dir):
     projects_dir = os.path.join(result_dir, "projects")
-    projects = ["AB-1234", "CD-4567", "NoProject"]
+    projects = ["AB-1234","CD-4567","NoProject"]
     sections = [
         "general_stats",
         "sequencing_metadata",

@@ -1,0 +1,137 @@
+<!--
+  ~ Copyright 2013-2024, Seqera Labs
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<html>
+<head>
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+</head>
+<body>
+<pre class="mermaid" style="text-align: center;">
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#B6ECE2',
+      'primaryTextColor': '#160F26',
+      'primaryBorderColor': '#065647',
+      'lineColor': '#545555',
+      'clusterBkg': '#BABCBD22',
+      'clusterBorder': '#DDDEDE',
+      'fontFamily': 'arial'
+    }
+  }
+}%%
+flowchart TB
+    subgraph " "
+    v2["Channel.fromList"]
+    v52["pipeline"]
+    v53["strandedness"]
+    v57["pipeline"]
+    v58["strandedness"]
+    v62["pipeline"]
+    v63["strandedness"]
+    v67["pipeline"]
+    v68["strandedness"]
+    v72["pipeline"]
+    v73["strandedness"]
+    v79["Channel.of"]
+    end
+    subgraph "NFCORE_DEMULTIPLEX [NFCORE_DEMULTIPLEX]"
+    subgraph "NFCORE_DEMULTIPLEX:DEMULTIPLEX [DEMULTIPLEX]"
+    subgraph "NFCORE_DEMULTIPLEX:DEMULTIPLEX:BCL_DEMULTIPLEX [BCL_DEMULTIPLEX]"
+    v27(["BCLCONVERT"])
+    v23(( ))
+    v32(( ))
+    v33(( ))
+    v35(( ))
+    v36(( ))
+    end
+    v54(["FASTQ_TO_SAMPLESHEET_RNASEQ"])
+    v59(["FASTQ_TO_SAMPLESHEET_ATACSEQ"])
+    v64(["FASTQ_TO_SAMPLESHEET_TAXPROFILER"])
+    v69(["FASTQ_TO_SAMPLESHEET_SAREK"])
+    v74(["FASTQ_TO_SAMPLESHEET_METHYLSEQ"])
+    v7(( ))
+    v43(( ))
+    v44(( ))
+    v49(( ))
+    end
+    end
+    subgraph " "
+    v28[" "]
+    v29[" "]
+    v30[" "]
+    v31[" "]
+    v34["interop"]
+    v42["empty_fastq"]
+    v48["ch_multiqc_files"]
+    v55[" "]
+    v60[" "]
+    v65[" "]
+    v70[" "]
+    v75[" "]
+    v82["ch_collated_versions"]
+    end
+    subgraph "PIPELINE_INITIALISATION [PIPELINE_INITIALISATION]"
+    v3(( ))
+    end
+    v2 --> v3
+    v23 --> v27
+    v27 --> v31
+    v27 --> v30
+    v27 --> v29
+    v27 --> v28
+    v27 --> v32
+    v27 --> v33
+    v27 --> v35
+    v27 --> v36
+    v33 --> v34
+    v32 --> v42
+    v44 --> v48
+    v52 --> v54
+    v53 --> v54
+    v43 --> v54
+    v54 --> v55
+    v57 --> v59
+    v58 --> v59
+    v43 --> v59
+    v59 --> v60
+    v62 --> v64
+    v63 --> v64
+    v43 --> v64
+    v64 --> v65
+    v67 --> v69
+    v68 --> v69
+    v43 --> v69
+    v69 --> v70
+    v72 --> v74
+    v73 --> v74
+    v43 --> v74
+    v74 --> v75
+    v79 --> v49
+    v49 --> v82
+    v3 --> v7
+    v7 --> v23
+    v32 --> v43
+    v35 --> v44
+    v36 --> v49
+
+</pre>
+<script type="module">
+  import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+  mermaid.initialize({ startOnLoad: true, maxTextSize: Number.MAX_SAFE_INTEGER, maxEdges: Number.MAX_SAFE_INTEGER });
+</script>
+</body>
+</html>

@@ -1,0 +1,5 @@
+RGID,RGSM,RGLB,Lane,Read1File,Read2File
+GAACTGAGCG.TCGTGGAGCG.1,AB-1234_14574-Qiagen-IndexSet1-SP-Lane1,UnknownLibrary,1,output/AB-1234/AB-1234_14574-Qiagen-IndexSet1-SP-Lane1_S1_L001_R1_001.fastq.gz,
+AGGTCAGATA.CTACAAGATA.1,AB-1234_14575-Qiagen-IndexSet1-SP-Lane1,UnknownLibrary,1,output/AB-1234/AB-1234_14575-Qiagen-IndexSet1-SP-Lane1_S2_L001_R1_001.fastq.gz,
+CGTCTCATAT.TATAGTAGCT.1,CD-4567_14576-Qiagen-IndexSet1-SP-Lane1,UnknownLibrary,1,output/CD-4567/CD-4567_14576-Qiagen-IndexSet1-SP-Lane1_S3_L001_R1_001.fastq.gz,
+ATTCCATAAG.TGCCTGGTGG.1,CD-4567_14577-Qiagen-IndexSet1-SP-Lane1,UnknownLibrary,1,output/CD-4567/CD-4567_14577-Qiagen-IndexSet1-SP-Lane1_S4_L001_R1_001.fastq.gz,

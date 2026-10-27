@@ -1,0 +1,21 @@
+[Header],,,,,,,
+FileFormatVersion,2,,,,,,
+Date,2025-12-05,,,,,,
+Instrument Type,NovaSeq X,,,,,,
+,,,,,,,
+[Reads],,,,,,,
+Read 1,36,,,,,,
+Read 2,0,,,,,,
+Index 1,10,,,,,,
+Index 2,10,,,,,,
+,,,,,,,
+,,,,,,,
+[BCLConvert_Settings],,,,,,,
+FastqCompressionFormat,gzip,,,,,,
+,,,,,,,
+[BCLConvert_Data],,,,,,,
+Lane,Sample_ID,Index,Index2,Sample_Project,OverrideCycles,custom_Description,custom_Sample_Name
+1,AB-1234_14574-Qiagen-IndexSet1-SP-Lane1,GAACTGAGCG,TCGTGGAGCG,AB-1234,Y36;I10;I10,LIBRARY_NAME:test,AB-1234_14574-Qiagen-IndexSet1-SP-Lane1
+1,AB-1234_14575-Qiagen-IndexSet1-SP-Lane1,AGGTCAGATA,CTACAAGATA,AB-1234,Y36;I10;I10,LIBRARY_NAME:test,AB-1234_14575-Qiagen-IndexSet1-SP-Lane1
+1,CD-4567_14576-Qiagen-IndexSet1-SP-Lane1,CGTCTCATAT,TATAGTAGCT,CD-4567,Y36;I10;I10,LIBRARY_NAME:test,CD-4567_14576-Qiagen-IndexSet1-SP-Lane1
+1,CD-4567_14577-Qiagen-IndexSet1-SP-Lane1,ATTCCATAAG,TGCCTGGTGG,CD-4567,Y36;I10;I10,LIBRARY_NAME:test,CD-4567_14577-Qiagen-IndexSet1-SP-Lane1
