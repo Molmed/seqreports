@@ -102,7 +102,7 @@ def test_all_sections_included_in_flowcell_report(result_dir):
 
 
 @pytest.mark.parametrize("result_dir", ["bclconvert"], indirect=True)
-def test_all_sections_included_in_bclcovert_flowcell_report(result_dir):
+def test_all_sections_included_in_bclconvert_flowcell_report(result_dir):
     flowcell_dir = os.path.join(result_dir, "flowcell_report")
     report_path = os.path.join(
         flowcell_dir, "200624_A00834_0183_BHMTFYDRXXMICRO_multiqc_report.html"
