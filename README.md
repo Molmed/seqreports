@@ -17,6 +17,7 @@ Awesome, you're all set! Let's try generating reports for your favourite runfold
 
         # Using parameters supplied on the command line
         nextflow run -profile snpseq,singularity main.nf \
+            --demultiplexer 'bclconvert'\
             --run_folder '/path/to/runfolder' \
             --fastqscreen_databases '/path/to/databases' \
             --checkqc_config '/path/to/checkqc.config'

@@ -90,7 +90,6 @@ def test_all_sections_included_in_flowcell_report(result_dir):
         flowcell_dir, "210510_M03910_0104_000000000-JHGJL_multiqc_report.html"
     )
     sections = [
-        "general_stats",
         "rrna",
         "sequencing_metadata",
         "bcl2fastq",
@@ -103,13 +102,12 @@ def test_all_sections_included_in_flowcell_report(result_dir):
 
 
 @pytest.mark.parametrize("result_dir", ["bclconvert"], indirect=True)
-def test_all_sections_included_in_bclcovert_flowcell_report(result_dir):
+def test_all_sections_included_in_bclconvert_flowcell_report(result_dir):
     flowcell_dir = os.path.join(result_dir, "flowcell_report")
     report_path = os.path.join(
-        flowcell_dir, "230825_M04034_0043_000000000-L6NVV_multiqc_report.html"
+        flowcell_dir, "200624_A00834_0183_BHMTFYDRXXMICRO_multiqc_report.html"
     )
     sections = [
-        "general_stats",
         "rrna",
         "sequencing_metadata",
         "bclconvert",
@@ -137,5 +135,25 @@ def test_all_sections_included_in_project_reports(result_dir):
             projects_dir,
             project,
             "210510_M03910_0104_000000000-JHGJL_" + project + "_multiqc_report.html",
+        )
+        check_sections_in_report(report_path, sections)
+
+
+@pytest.mark.parametrize("result_dir", ["bclconvert"], indirect=True)
+def test_all_sections_included_in_bclconvert_project_reports(result_dir):
+    projects_dir = os.path.join(result_dir, "projects")
+    projects = ["AB-1234", "CD-4567", "NoProject"]
+    sections = [
+        "general_stats",
+        "sequencing_metadata",
+        "fastq_screen",
+        "fastqc",
+    ]
+
+    for project in projects:
+        report_path = os.path.join(
+            projects_dir,
+            project,
+            "200624_A00834_0183_BHMTFYDRXXMICRO_" + project + "_multiqc_report.html",
         )
         check_sections_in_report(report_path, sections)

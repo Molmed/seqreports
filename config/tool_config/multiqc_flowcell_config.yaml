@@ -1,5 +1,7 @@
 # Config for flowcell reports
 
+skip_generalstats: true
+
 run_modules:
     - fastqc
     - fastq_screen
@@ -15,8 +17,8 @@ table_columns_visible:
         total_sequences: False
 
 top_modules:
-    - 'custom_content'
-    - 'bcl2fastq'
     - 'bclconvert'
+    - 'bcl2fastq'
+    - 'custom_content'
     - 'interop'
 
